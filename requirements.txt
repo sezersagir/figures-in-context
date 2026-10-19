@@ -1,1 +1,1 @@
-# Keine Zusatzpakete nötig: Figures in Context nutzt nur die Python-Standardbibliothek (Python 3.9 oder neuer).
+# No extra packages needed: Figures in Context uses only the Python standard library (Python 3.9 or newer).

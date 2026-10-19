@@ -1,0 +1,27 @@
+{
+  "testfaelle": "testfaelle/charge-*.json",
+  "judges": {
+    "zahlen": {
+      "anbieter": "test",
+      "modell": "judge-zahlen"
+    },
+    "rechenweg": {
+      "anbieter": "test",
+      "modell": "judge-rechenweg"
+    },
+    "plausibilitaet": {
+      "anbieter": "test",
+      "modell": "judge-plausibilitaet"
+    }
+  },
+  "parallel": 4,
+  "test": true,
+  "protokoll": {
+    "prompt_hashes": {
+      "judge_zahlen": "ae9b745d8e84",
+      "judge_rechenweg": "6e62ee2a136e",
+      "judge_plausibilitaet": "c11838e3f2d2"
+    },
+    "antworten_hash": "a1294f029c2e"
+  }
+}

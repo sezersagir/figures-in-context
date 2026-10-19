@@ -1,0 +1,289 @@
+[
+  {
+    "id": "FC-001",
+    "category": "percentages",
+    "difficulty": "easy",
+    "document": {
+      "file": "documents/halvorsen-annual-report-2025.md",
+      "page": 1
+    },
+    "question": "By what percentage did Halvorsen Freight Group's revenue grow in 2025 compared with 2024? Give the result in percent, rounded to 2 decimal places.",
+    "reference_answer": {
+      "value": "7.29",
+      "unit": "%",
+      "decimals": 2,
+      "exact": false
+    },
+    "numbers_used": [
+      {
+        "value": "1,284.6",
+        "unit": "£ million",
+        "meaning": "Revenue 2025",
+        "location": "Page 1, Financial Highlights, row Revenue"
+      },
+      {
+        "value": "1,197.3",
+        "unit": "£ million",
+        "meaning": "Revenue 2024 (restated)",
+        "location": "Page 1, Financial Highlights, row Revenue"
+      }
+    ],
+    "working": [
+      "Difference: 1,284.6 - 1,197.3 = 87.3 (£ million)",
+      "Growth: 87.3 / 1,197.3 = 0.072914...",
+      "In percent: 7.2914...% -> rounded 7.29%"
+    ],
+    "required_info": [
+      "States the basis of comparison: restated 2024 revenue of £1,197.3 million"
+    ],
+    "traps": [
+      "The original figure 1,211.8 from Note 4 would give 6.01%"
+    ]
+  },
+  {
+    "id": "FC-002",
+    "category": "mixed units",
+    "difficulty": "medium",
+    "document": {
+      "file": "documents/halvorsen-annual-report-2025.md",
+      "page": 1
+    },
+    "question": "What was Halvorsen Freight Group's revenue per average employee in 2025? Give the result in pounds sterling (GBP), rounded to 2 decimal places.",
+    "reference_answer": {
+      "value": "130522.25",
+      "unit": "GBP",
+      "decimals": 2,
+      "exact": false
+    },
+    "numbers_used": [
+      {
+        "value": "1,284.6",
+        "unit": "£ million",
+        "meaning": "Revenue 2025",
+        "location": "Page 1, Financial Highlights, row Revenue"
+      },
+      {
+        "value": "9,842",
+        "unit": "people",
+        "meaning": "Average number of employees 2025",
+        "location": "Page 1, Financial Highlights, last row"
+      }
+    ],
+    "working": [
+      "Revenue in GBP: 1,284.6 million = 1,284,600,000",
+      "Per employee: 1,284,600,000 / 9,842 = 130,522.2515...",
+      "Rounded: 130,522.25 GBP"
+    ],
+    "required_info": [
+      "States the reference figure: an average of 9,842 employees in 2025"
+    ],
+    "traps": [
+      "Without converting millions the result would be 0.13",
+      "The 2024 headcount (9,517) would give 134,979.51"
+    ]
+  },
+  {
+    "id": "FC-003",
+    "category": "mixed units",
+    "difficulty": "medium",
+    "document": {
+      "file": "documents/halvorsen-annual-report-2025.md",
+      "page": "1-2"
+    },
+    "question": "What share of Halvorsen Freight Group's total 2025 revenue came from the Ocean Forwarding segment? Give the result in percent, rounded to 2 decimal places.",
+    "reference_answer": {
+      "value": "34.17",
+      "unit": "%",
+      "decimals": 2,
+      "exact": false
+    },
+    "numbers_used": [
+      {
+        "value": "438,915",
+        "unit": "£ thousand",
+        "meaning": "Ocean Forwarding revenue 2025",
+        "location": "Page 2, Note 3, row Ocean Forwarding"
+      },
+      {
+        "value": "1,284.6",
+        "unit": "£ million",
+        "meaning": "Revenue 2025",
+        "location": "Page 1, Financial Highlights, row Revenue"
+      }
+    ],
+    "working": [
+      "Bring to the same unit: £1,284.6 million = £1,284,600 thousand",
+      "Share: 438,915 / 1,284,600 = 0.341674...",
+      "In percent: 34.1674...% -> rounded 34.17%"
+    ],
+    "required_info": [
+      "States the Ocean Forwarding segment revenue for 2025 (about £438.9 million)"
+    ],
+    "traps": [
+      "Without aligning units: 438,915 / 1,284.6 gives an absurd value (about 34,167%)"
+    ]
+  },
+  {
+    "id": "FC-004",
+    "category": "very large numbers",
+    "difficulty": "medium",
+    "document": {
+      "file": "documents/halvorsen-annual-report-2025.md",
+      "page": 1
+    },
+    "question": "Assuming the number of shares in issue at 31 December 2025 applies to both the interim and the proposed final dividend, what is the total dividend amount for the 2025 financial year? Give the exact result in pounds sterling (GBP), without rounding.",
+    "reference_answer": {
+      "value": "32334339.375",
+      "unit": "GBP",
+      "decimals": null,
+      "exact": true
+    },
+    "numbers_used": [
+      {
+        "value": "287,416,350",
+        "unit": "shares",
+        "meaning": "Shares in issue at 31 December 2025",
+        "location": "Page 1, paragraph below the table"
+      },
+      {
+        "value": "3.40",
+        "unit": "pence",
+        "meaning": "Interim dividend per share 2025",
+        "location": "Page 1, Financial Highlights"
+      },
+      {
+        "value": "7.85",
+        "unit": "pence",
+        "meaning": "Proposed final dividend per share 2025",
+        "location": "Page 1, Financial Highlights (also in the Chair's statement)"
+      }
+    ],
+    "working": [
+      "Total dividend per share: 3.40 + 7.85 = 11.25 pence",
+      "In GBP: 11.25 pence = 0.1125 GBP",
+      "Total: 287,416,350 x 0.1125 = 32,334,339.375 GBP"
+    ],
+    "required_info": [
+      "States the dividend per share for 2025: 11.25 pence (3.40 interim + 7.85 final)",
+      "Points out that the amount assumes the same number of shares"
+    ],
+    "traps": [
+      "The 2024 share count (291,032,800) would give 32,741,190",
+      "Without converting pence the result is 100 times too large",
+      "Only the final dividend of 7.85p would give 22,562,183.475",
+      "The 2024 dividends (3.15 + 7.60) would give 30,897,257.625"
+    ]
+  },
+  {
+    "id": "FC-005",
+    "category": "percentages",
+    "difficulty": "easy",
+    "document": {
+      "file": "documents/kessler-price-adjustment-letter.md",
+      "page": 1
+    },
+    "question": "By what percentage will the unit price of article A-220 increase from 1 March 2026? Give the result in percent, rounded to 2 decimal places.",
+    "reference_answer": {
+      "value": "5.57",
+      "unit": "%",
+      "decimals": 2,
+      "exact": false
+    },
+    "numbers_used": [
+      {
+        "value": "4.85",
+        "unit": "EUR per unit",
+        "meaning": "Current price A-220",
+        "location": "Page 1, price table, row A-220"
+      },
+      {
+        "value": "5.12",
+        "unit": "EUR per unit",
+        "meaning": "New price A-220",
+        "location": "Page 1, price table, row A-220"
+      }
+    ],
+    "working": [
+      "Difference: 5.12 - 4.85 = 0.27 EUR",
+      "Increase: 0.27 / 4.85 = 0.055670...",
+      "In percent: 5.5670...% -> rounded 5.57%"
+    ],
+    "required_info": [
+      "States the old and new price: 4.85 EUR -> 5.12 EUR per unit"
+    ],
+    "traps": [
+      "The provisional price 5.25 from the November letter would give 8.25%"
+    ]
+  },
+  {
+    "id": "FC-006",
+    "category": "multi-step calculation",
+    "difficulty": "hard",
+    "document": {
+      "file": "documents/kessler-price-adjustment-letter.md",
+      "page": "1-2"
+    },
+    "question": "Using the 2025 quantities given as the planning basis and the new prices, what would Brightwater Packaging Ltd's annual net invoice value be after the volume rebate? Give the exact result in euros (EUR), without rounding.",
+    "reference_answer": {
+      "value": "1345925.4",
+      "unit": "EUR",
+      "decimals": null,
+      "exact": true
+    },
+    "numbers_used": [
+      {
+        "value": "48,500",
+        "unit": "units",
+        "meaning": "Quantity A-220",
+        "location": "Page 2, Planning basis"
+      },
+      {
+        "value": "5.12",
+        "unit": "EUR per unit",
+        "meaning": "New price A-220",
+        "location": "Page 1, price table"
+      },
+      {
+        "value": "1,240",
+        "unit": "packs of 1,000 units",
+        "meaning": "Quantity B-310",
+        "location": "Page 2, Planning basis"
+      },
+      {
+        "value": "912.50",
+        "unit": "EUR per 1,000 units",
+        "meaning": "New price B-310",
+        "location": "Page 1, price table"
+      },
+      {
+        "value": "3%",
+        "unit": "",
+        "meaning": "Volume rebate",
+        "location": "Page 2, Volume rebate"
+      },
+      {
+        "value": "250,000",
+        "unit": "EUR",
+        "meaning": "Rebate threshold",
+        "location": "Page 2, Volume rebate"
+      }
+    ],
+    "working": [
+      "A-220: 48,500 x 5.12 = 248,320.00 EUR",
+      "B-310: 1,240 packs x 912.50 = 1,131,500.00 EUR",
+      "C-045: 0 units = 0 EUR",
+      "Gross: 248,320 + 1,131,500 = 1,379,820.00 EUR",
+      "Rebate only on the part above 250,000: 3% x 1,129,820 = 33,894.60 EUR",
+      "Net: 1,379,820 - 33,894.60 = 1,345,925.40 EUR"
+    ],
+    "required_info": [
+      "States the gross value before the rebate: 1,379,820.00 EUR",
+      "States the amount of the rebate: 33,894.60 EUR"
+    ],
+    "traps": [
+      "Rebate on the whole amount: 1,338,425.40",
+      "B-310 calculated as 1,240 units instead of packs",
+      "USD conversion at 1.0835 (applies only to the US subsidiary)"
+    ]
+  }
+]

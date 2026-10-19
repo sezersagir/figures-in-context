@@ -1,9 +1,9 @@
-"""Web-App: Python-Backend, HTML-Frontend, nur Standardbibliothek.
+"""Web app: Python backend, HTML frontend, standard library only.
 
     python -m figures_in_context app        → http://127.0.0.1:8765/
 
-Läufe anlegen und starten (mit Fortschritt), Review, Report, Modelle und API-Schlüssel einstellen.
-Der Server hört nur auf 127.0.0.1, ist also nur von diesem Rechner aus erreichbar.
+Create and start runs (with progress), review, report, set models and API keys.
+The server only listens on 127.0.0.1, so it can only be reached from this computer.
 """
 
 import collections
@@ -16,324 +16,324 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
-from . import auswertung, daten, kalibrierung, modelle, pipeline
-from .review import SEITE as REVIEW_SEITE
-from .review import ReviewSitzung
+from . import calibration, data, models, pipeline, report
+from .review import PAGE as REVIEW_PAGE
+from .review import ReviewSession
 
-APP_SEITE = Path(__file__).parent / "app.html"
-ANBIETER = ("anthropic", "openai", "google", "test")
-DOWNLOADS = {"report.html", "report.md", "review_ergebnis.csv", "review_queue.csv"}
+APP_PAGE = Path(__file__).parent / "app.html"
+PROVIDERS = ("anthropic", "openai", "google", "test")
+DOWNLOADS = {"report.html", "report.md", "review_results.csv", "review_queue.csv"}
 
 
 class Job:
-    """Ein laufender Start eines Laufs. Es läuft immer höchstens einer gleichzeitig."""
+    """A run (or calibration) working in the background. At most one runs at a time."""
 
     def __init__(self, name):
         self.name = name
         self.log = collections.deque(maxlen=300)
-        self.fortschritt = ""
-        self.laeuft = True
-        self.ergebnis = None
+        self.progress = ""
+        self.running = True
+        self.outcome = None
 
 
 _job = None
-_job_sperre = threading.Lock()
-_sitzungen = {}
+_job_lock = threading.Lock()
+_sessions = {}
 
 
-def _melde(text):
+def _report_progress(text):
     print(text, flush=True)
     job = _job
     if job is None:
         return
-    if re.match(r"^(Antworten|Judges): \d+/\d+$", text):
-        job.fortschritt = text
+    if re.match(r"^(Answers|Judges): \d+/\d+$", text):
+        job.progress = text
     else:
         job.log.append(text)
 
 
-daten.melde = _melde
+data.report_progress = _report_progress
 
 
-def _im_hintergrund(name, vorbereiten, arbeit):
-    """Startet arbeit() in einem eigenen Thread. vorbereiten() läuft vorher und darf abbrechen.
-    name darf eine Funktion sein, wenn der Name erst nach vorbereiten() feststeht."""
+def _in_background(name, prepare, work):
+    """Runs work() in its own thread. prepare() runs first and may raise to cancel.
+    name may be a function when the name is only known after prepare()."""
     global _job
-    with _job_sperre:
-        if _job and _job.laeuft:
-            raise pipeline.LaufFehler(f"Es läuft gerade schon etwas ({_job.name}). Bitte warten, bis es fertig ist.")
-        vorbereiten()
+    with _job_lock:
+        if _job and _job.running:
+            raise pipeline.RunError(f"Something is already running ({_job.name}). Please wait until it has finished.")
+        prepare()
         name = name() if callable(name) else name
         _job = Job(name)
     job = _job
 
-    def ausfuehren():
+    def execute():
         try:
-            job.ergebnis = "fertig" if arbeit() else "unvollstaendig"
+            job.outcome = "done" if work() else "incomplete"
         except Exception as e:
-            job.log.append(f"FEHLER: {type(e).__name__}: {e}")
+            job.log.append(f"ERROR: {type(e).__name__}: {e}")
             traceback.print_exc()
-            job.ergebnis = "fehler"
+            job.outcome = "failed"
         finally:
-            job.fortschritt = ""
-            job.laeuft = False
-            _sitzungen.pop(name, None)  # Review-Liste kann neu sein
+            job.progress = ""
+            job.running = False
+            _sessions.pop(name, None)  # the review queue may be new
 
-    threading.Thread(target=ausfuehren, daemon=True).start()
-
-
-def _starte_lauf(name):
-    geladen = {}
-
-    def vorbereiten():
-        geladen["lauf"] = pipeline.lade_lauf(name, warnen=False)
-
-    def arbeit():
-        pipeline.lade_lauf(name)  # gibt Warnungen ins Protokoll
-        return pipeline.start(*geladen["lauf"])
-
-    _im_hintergrund(name, vorbereiten, arbeit)
+    threading.Thread(target=execute, daemon=True).start()
 
 
-def _starte_kalibrierung(name=None, test=False):
-    ziel = {}
+def _start_run(name):
+    loaded = {}
 
-    def vorbereiten():
-        ziel["ordner"] = kalibrierung.lade(name)[0] if name else kalibrierung.neu(test=test)
-        ziel["name"] = "kalibrierung:" + ziel["ordner"].name
+    def prepare():
+        loaded["run"] = pipeline.load_run(name, warn=False)
 
-    def arbeit():
-        return kalibrierung.start(ziel["ordner"], kalibrierung.lade(ziel["ordner"].name)[1])
+    def work():
+        pipeline.load_run(name)  # writes warnings to the log
+        return pipeline.start(*loaded["run"])
 
-    _im_hintergrund(lambda: ziel["name"], vorbereiten, arbeit)
-    return ziel["ordner"].name
+    _in_background(name, prepare, work)
+
+
+def _start_calibration(name=None, test=False):
+    target = {}
+
+    def prepare():
+        target["dir"] = calibration.load(name)[0] if name else calibration.new(test=test)
+        target["name"] = "calibration:" + target["dir"].name
+
+    def work():
+        return calibration.start(target["dir"], calibration.load(target["dir"].name)[1])
+
+    _in_background(lambda: target["name"], prepare, work)
+    return target["dir"].name
 
 
 def _status():
-    config = daten.lade_config()
-    anzahl, probleme = pipeline.pruefe()
-    laeufe = []
-    for name in pipeline.alle_laeufe():
+    config = data.load_config()
+    count, problems = pipeline.check_cases()
+    runs = []
+    for name in pipeline.all_runs():
         try:
-            k = pipeline.kennzahlen(pipeline.LAUFORDNER / name)
+            p = pipeline.progress(pipeline.RUNS_DIR / name)
         except Exception as e:
-            k = {"fehler": str(e)}
-        laeufe.append({"name": name, **k})
-    kalibrierungen = []
-    for name in kalibrierung.alle():
+            p = {"error": str(e)}
+        runs.append({"name": name, **p})
+    calibrations = []
+    for name in calibration.all_calibrations():
         try:
-            k = kalibrierung.stand(kalibrierung.ORDNER / name)
+            s = calibration.status(calibration.RUNS_DIR / name)
         except Exception as e:
-            k = {"fehler": str(e)}
-        kalibrierungen.append({"name": name, **k})
+            s = {"error": str(e)}
+        calibrations.append({"name": name, **s})
     return {
         "config": config,
-        "schluessel": {a: bool(_hat_schluessel(a)) for a in ("anthropic", "openai", "google")},
-        "testfaelle": anzahl,
-        "testfall_probleme": probleme,
-        "laeufe": laeufe,
-        "kalibrierungen": kalibrierungen,
-        "kalibrierung_antworten": len(kalibrierung.lade_antworten()),
+        "keys": {p: bool(_has_key(p)) for p in ("anthropic", "openai", "google")},
+        "test_cases": count,
+        "test_case_problems": problems,
+        "runs": runs,
+        "calibrations": calibrations,
+        "calibration_answers": len(calibration.load_answers()),
         "job": _job_info(),
     }
 
 
-def _hat_schluessel(anbieter):
+def _has_key(provider):
     try:
-        return modelle.schluessel(anbieter)
-    except modelle.ApiFehler:
+        return models.api_key(provider)
+    except models.ApiError:
         return None
 
 
 def _job_info():
     if not _job:
         return None
-    return {"name": _job.name, "laeuft": _job.laeuft, "fortschritt": _job.fortschritt,
-            "log": list(_job.log), "ergebnis": _job.ergebnis}
+    return {"name": _job.name, "running": _job.running, "progress": _job.progress,
+            "log": list(_job.log), "outcome": _job.outcome}
 
 
-def _speichere_schluessel(eingabe):
-    zeilen = modelle.ENV_DATEI.read_text(encoding="utf-8").splitlines() if modelle.ENV_DATEI.exists() else []
-    for anbieter, name in modelle.SCHLUESSEL.items():
-        wert = (eingabe.get(anbieter) or "").strip()
-        if not wert:
+def _save_keys(payload):
+    lines = models.ENV_FILE.read_text(encoding="utf-8").splitlines() if models.ENV_FILE.exists() else []
+    for provider, name in models.KEYS.items():
+        value = (payload.get(provider) or "").strip()
+        if not value:
             continue
-        if not re.fullmatch(r"[\x21-\x7e]+", wert):
-            raise ValueError(f"Der Schlüssel für {anbieter} enthält ungültige Zeichen.")
-        zeilen = [z for z in zeilen if not z.strip().startswith(name + "=")]
-        zeilen.append(f"{name}={wert}")
-    modelle.ENV_DATEI.write_text("\n".join(zeilen) + "\n", encoding="utf-8")
-    modelle.lade_env()
+        if not re.fullmatch(r"[\x21-\x7e]+", value):
+            raise ValueError(f"The key for {provider} contains invalid characters.")
+        lines = [line for line in lines if not line.strip().startswith(name + "=")]
+        lines.append(f"{name}={value}")
+    models.ENV_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    models.load_env()
 
 
-def _speichere_config(eingabe):
-    config = daten.lade_config()
+def _save_config(payload):
+    config = data.load_config()
 
-    def ziel(z):
-        if z.get("anbieter") not in ANBIETER or not str(z.get("modell", "")).strip():
-            raise ValueError("Jedes Modell braucht einen Anbieter und einen Modellnamen.")
-        aus = {"anbieter": z["anbieter"], "modell": str(z["modell"]).strip()}
-        if z.get("effort"):
-            aus["effort"] = str(z["effort"])
-        return aus
+    def target(t):
+        if t.get("provider") not in PROVIDERS or not str(t.get("model", "")).strip():
+            raise ValueError("Every model needs a provider and a model name.")
+        out = {"provider": t["provider"], "model": str(t["model"]).strip()}
+        if t.get("effort"):
+            out["effort"] = str(t["effort"])
+        return out
 
-    testobjekte = [ziel(z) for z in eingabe.get("testobjekte", []) if str(z.get("modell", "")).strip()]
-    if not testobjekte:
-        raise ValueError("Mindestens ein Testobjekt angeben.")
-    config["testobjekte"] = testobjekte
-    config["judges"] = {j: ziel(eingabe["judges"][j]) for j in ("zahlen", "rechenweg", "plausibilitaet")}
-    wdh = int(eingabe.get("wiederholungen", 1))
-    anteil = float(eingabe["stichprobe"]["anteil"])
-    minimum = int(eingabe["stichprobe"]["minimum"])
-    if not (1 <= wdh <= 10 and 0 <= anteil <= 1 and minimum >= 0):
-        raise ValueError("Wiederholungen 1–10, Stichprobenanteil 0–1, Minimum ab 0.")
-    config["wiederholungen"] = wdh
-    config["stichprobe"].update({"anteil": anteil, "minimum": minimum})
-    (daten.BASIS / "config" / "lauf.json").write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n",
-                                                      encoding="utf-8")
+    under_test = [target(t) for t in payload.get("models_under_test", []) if str(t.get("model", "")).strip()]
+    if not under_test:
+        raise ValueError("Enter at least one model under test.")
+    config["models_under_test"] = under_test
+    config["judges"] = {j: target(payload["judges"][j]) for j in ("numbers", "calculation", "plausibility")}
+    reps = int(payload.get("repetitions", 1))
+    share = float(payload["sample"]["share"])
+    minimum = int(payload["sample"]["minimum"])
+    if not (1 <= reps <= 10 and 0 <= share <= 1 and minimum >= 0):
+        raise ValueError("Repetitions 1–10, sample share 0–1, minimum 0 or more.")
+    config["repetitions"] = reps
+    config["sample"].update({"share": share, "minimum": minimum})
+    (data.BASE / "config" / "run.json").write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n",
+                                                   encoding="utf-8")
 
 
-def _protokoll(ordner, ab):
-    """Einträge ab Nummer `ab` (für Live-Nachladen) und eine Summe über alle."""
-    alle = daten.lies_jsonl(ordner / daten.PROTOKOLL)
-    anfragen = [e for e in alle if e.get("schritt")]
-    summe = {
-        "anfragen": len(anfragen),
-        "fehler": sum(1 for e in anfragen if e["art"] == "fehler"),
-        "wiederholt": sum(1 for e in anfragen if (e.get("versuche") or 1) > 1),
-        "tokens_rein": sum(e.get("tokens_rein") or 0 for e in anfragen),
-        "tokens_raus": sum(e.get("tokens_raus") or 0 for e in anfragen),
-        "dauer_s": round(sum(e.get("dauer_s") or 0 for e in anfragen), 1),
+def _log(run_dir, start):
+    """Entries from number `start` on (for live loading) and a summary over all of them."""
+    entries = data.read_jsonl(run_dir / data.LOG)
+    requests = [e for e in entries if e.get("step")]
+    summary = {
+        "requests": len(requests),
+        "errors": sum(1 for e in requests if e["kind"] == "error"),
+        "retried": sum(1 for e in requests if (e.get("attempts") or 1) > 1),
+        "tokens_in": sum(e.get("tokens_in") or 0 for e in requests),
+        "tokens_out": sum(e.get("tokens_out") or 0 for e in requests),
+        "duration_s": round(sum(e.get("duration_s") or 0 for e in requests), 1),
     }
-    return {"gesamt": len(alle), "eintraege": alle[ab:], "summe": summe}
+    return {"total": len(entries), "entries": entries[start:], "summary": summary}
 
 
-def _sitzung(name):
-    if name not in _sitzungen:
-        ordner, _, testfaelle = pipeline.lade_lauf(name, warnen=False)
-        _sitzungen[name] = ReviewSitzung(ordner, testfaelle)
-    return _sitzungen[name]
+def _session(name):
+    if name not in _sessions:
+        run_dir, _, cases = pipeline.load_run(name, warn=False)
+        _sessions[name] = ReviewSession(run_dir, cases)
+    return _sessions[name]
 
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
-    def _sende(self, code, inhalt, typ="application/json; charset=utf-8", extra=None):
-        if isinstance(inhalt, (dict, list)):
-            inhalt = json.dumps(inhalt, ensure_ascii=False).encode("utf-8")
+    def _send(self, code, body, content_type="application/json; charset=utf-8", extra=None):
+        if isinstance(body, (dict, list)):
+            body = json.dumps(body, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
-        self.send_header("Content-Type", typ)
+        self.send_header("Content-Type", content_type)
         self.send_header("Cache-Control", "no-store")
         for k, v in (extra or {}).items():
             self.send_header(k, v)
         self.end_headers()
-        self.wfile.write(inhalt)
+        self.wfile.write(body)
 
-    def _fehler(self, code, text):
-        self._sende(code, {"fehler": text})
+    def _error(self, code, text):
+        self._send(code, {"error": text})
 
-    def _erlaubt(self):
-        # Schutz davor, dass eine fremde Webseite im Browser Anfragen an diesen Server schickt
+    def _allowed(self):
+        # Protects against a foreign web page in the browser sending requests to this server
         host = (self.headers.get("Host") or "").split(":")[0]
         return host in ("127.0.0.1", "localhost")
 
     def do_GET(self):
-        if not self._erlaubt():
-            return self._fehler(403, "Nur lokal erreichbar.")
-        pfad = unquote(urlparse(self.path).path)
+        if not self._allowed():
+            return self._error(403, "Only reachable locally.")
+        path = unquote(urlparse(self.path).path)
         try:
-            if pfad == "/":
-                return self._sende(200, APP_SEITE.read_bytes(), "text/html; charset=utf-8")
-            if pfad == "/api/status":
-                return self._sende(200, _status())
-            m = re.fullmatch(r"/api/(laeufe|kalibrierungen)/([\w.-]+)/protokoll", pfad)
+            if path == "/":
+                return self._send(200, APP_PAGE.read_bytes(), "text/html; charset=utf-8")
+            if path == "/api/status":
+                return self._send(200, _status())
+            m = re.fullmatch(r"/api/(runs|calibrations)/([\w.-]+)/log", path)
             if m:
-                ordner = (pipeline.lade_lauf(m.group(2), warnen=False)[0] if m.group(1) == "laeufe"
-                          else kalibrierung.lade(m.group(2))[0])
-                ab = int((parse_qs(urlparse(self.path).query).get("ab") or ["0"])[0])
-                return self._sende(200, _protokoll(ordner, max(0, ab)))
-            m = re.fullmatch(r"/review/([\w.-]+)/", pfad)
+                run_dir = (pipeline.load_run(m.group(2), warn=False)[0] if m.group(1) == "runs"
+                           else calibration.load(m.group(2))[0])
+                start = int((parse_qs(urlparse(self.path).query).get("from") or ["0"])[0])
+                return self._send(200, _log(run_dir, max(0, start)))
+            m = re.fullmatch(r"/review/([\w.-]+)/", path)
             if m:
-                return self._sende(200, REVIEW_SEITE.read_bytes(), "text/html; charset=utf-8")
-            m = re.fullmatch(r"/review/([\w.-]+)/api/faelle", pfad)
+                return self._send(200, REVIEW_PAGE.read_bytes(), "text/html; charset=utf-8")
+            m = re.fullmatch(r"/review/([\w.-]+)/api/cases", path)
             if m:
-                return self._sende(200, _sitzung(m.group(1)).daten())
-            m = re.fullmatch(r"/kalibrierungen/([\w.-]+)/kalibrierung\.html", pfad)
+                return self._send(200, _session(m.group(1)).data())
+            m = re.fullmatch(r"/calibrations/([\w.-]+)/calibration\.html", path)
             if m:
-                datei = kalibrierung.lade(m.group(1))[0] / "kalibrierung.html"
-                if not datei.exists():
-                    return self._fehler(404, "Ergebnis gibt es noch nicht.")
-                return self._sende(200, datei.read_bytes(), "text/html; charset=utf-8")
-            m = re.fullmatch(r"/laeufe/([\w.-]+)/([\w.-]+)", pfad)
+                file = calibration.load(m.group(1))[0] / "calibration.html"
+                if not file.exists():
+                    return self._error(404, "No result yet.")
+                return self._send(200, file.read_bytes(), "text/html; charset=utf-8")
+            m = re.fullmatch(r"/runs/([\w.-]+)/([\w.-]+)", path)
             if m and m.group(2) in DOWNLOADS:
-                ordner = pipeline.lade_lauf(m.group(1), warnen=False)[0]
-                datei = ordner / m.group(2)
-                if not datei.exists():
-                    return self._fehler(404, "Datei gibt es noch nicht.")
-                typ = "text/html; charset=utf-8" if datei.suffix == ".html" else "text/plain; charset=utf-8"
-                extra = {} if datei.suffix == ".html" else {
+                run_dir = pipeline.load_run(m.group(1), warn=False)[0]
+                file = run_dir / m.group(2)
+                if not file.exists():
+                    return self._error(404, "This file doesn't exist yet.")
+                content_type = "text/html; charset=utf-8" if file.suffix == ".html" else "text/plain; charset=utf-8"
+                extra = {} if file.suffix == ".html" else {
                     "Content-Disposition": f'attachment; filename="{m.group(1)}_{m.group(2)}"'}
-                return self._sende(200, datei.read_bytes(), typ, extra)
-            self._fehler(404, "Nicht gefunden.")
-        except (pipeline.LaufFehler, kalibrierung.KalibrierungsFehler, FileNotFoundError, ValueError) as e:
-            self._fehler(404, str(e))
+                return self._send(200, file.read_bytes(), content_type, extra)
+            self._error(404, "Not found.")
+        except (pipeline.RunError, calibration.CalibrationError, FileNotFoundError, ValueError) as e:
+            self._error(404, str(e))
 
     def do_POST(self):
-        # Eigener Header erzwingt bei fremden Seiten einen CORS-Preflight, den dieser Server nie erlaubt
-        if not self._erlaubt() or self.headers.get("X-Figures-In-Context") != "1":
-            return self._fehler(403, "Nur aus der Oberfläche von Figures in Context erlaubt.")
-        pfad = unquote(urlparse(self.path).path)
-        laenge = int(self.headers.get("Content-Length", 0))
+        # A custom header forces foreign pages into a CORS preflight, which this server never allows
+        if not self._allowed() or self.headers.get("X-Figures-In-Context") != "1":
+            return self._error(403, "Only allowed from the Figures in Context interface.")
+        path = unquote(urlparse(self.path).path)
+        length = int(self.headers.get("Content-Length", 0))
         try:
-            eingabe = json.loads(self.rfile.read(laenge) or b"{}")
+            payload = json.loads(self.rfile.read(length) or b"{}")
         except ValueError:
-            return self._fehler(400, "Ungültige Anfrage.")
+            return self._error(400, "Invalid request.")
         try:
-            if pfad == "/api/laeufe":
-                ordner = pipeline.neu(str(eingabe.get("name", "")), test=bool(eingabe.get("test")))
-                return self._sende(200, {"name": ordner.name})
-            m = re.fullmatch(r"/api/laeufe/([\w.-]+)/start", pfad)
+            if path == "/api/runs":
+                run_dir = pipeline.new(str(payload.get("name", "")), test=bool(payload.get("test")))
+                return self._send(200, {"name": run_dir.name})
+            m = re.fullmatch(r"/api/runs/([\w.-]+)/start", path)
             if m:
-                _starte_lauf(m.group(1))
-                return self._sende(200, {"ok": True})
-            if pfad == "/api/kalibrierung":
-                name = _starte_kalibrierung(eingabe.get("name"), test=bool(eingabe.get("test")))
-                return self._sende(200, {"name": name})
-            m = re.fullmatch(r"/api/laeufe/([\w.-]+)/auswertung", pfad)
+                _start_run(m.group(1))
+                return self._send(200, {"ok": True})
+            if path == "/api/calibration":
+                name = _start_calibration(payload.get("name"), test=bool(payload.get("test")))
+                return self._send(200, {"name": name})
+            m = re.fullmatch(r"/api/runs/([\w.-]+)/report", path)
             if m:
-                ordner, config, testfaelle = pipeline.lade_lauf(m.group(1), warnen=False)
-                auswertung.lauf(ordner, config, testfaelle)
-                return self._sende(200, {"ok": True})
-            m = re.fullmatch(r"/review/([\w.-]+)/api/speichern", pfad)
+                run_dir, config, cases = pipeline.load_run(m.group(1), warn=False)
+                report.run(run_dir, config, cases)
+                return self._send(200, {"ok": True})
+            m = re.fullmatch(r"/review/([\w.-]+)/api/save", path)
             if m:
-                _sitzung(m.group(1)).speichern(eingabe)
-                return self._sende(200, {"ok": True})
-            if pfad == "/api/schluessel":
-                _speichere_schluessel(eingabe)
-                return self._sende(200, {"ok": True})
-            if pfad == "/api/config":
-                _speichere_config(eingabe)
-                return self._sende(200, {"ok": True})
-            self._fehler(404, "Nicht gefunden.")
-        except (pipeline.LaufFehler, kalibrierung.KalibrierungsFehler, ValueError, KeyError, TypeError,
+                _session(m.group(1)).save(payload)
+                return self._send(200, {"ok": True})
+            if path == "/api/keys":
+                _save_keys(payload)
+                return self._send(200, {"ok": True})
+            if path == "/api/config":
+                _save_config(payload)
+                return self._send(200, {"ok": True})
+            self._error(404, "Not found.")
+        except (pipeline.RunError, calibration.CalibrationError, ValueError, KeyError, TypeError,
                 FileNotFoundError) as e:
-            self._fehler(400, str(e))
+            self._error(400, str(e))
 
 
-def starte(port=8765, browser=True):
+def serve(port=8765, browser=True):
     try:
         server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     except OSError:
-        raise SystemExit(f"Port {port} ist belegt. Läuft die App schon? Sonst: python -m figures_in_context app 8766")
+        raise SystemExit(f"Port {port} is in use. Is the app already running? Otherwise: python -m figures_in_context app 8766")
     url = f"http://127.0.0.1:{port}/"
-    print(f"Figures in Context läuft: {url}")
-    print("Dieses Fenster offen lassen. Beenden mit Strg+C.")
+    print(f"Figures in Context running: {url}")
+    print("Keep this window open. Stop with Ctrl+C.")
     if browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nBeendet.")
+        print("\nStopped.")
     finally:
         server.server_close()

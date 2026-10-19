@@ -1,0 +1,16 @@
+{
+  "test_cases": "test_cases/batch-*.json",
+  "repetitions": 1,
+  "models_under_test": [
+    {"provider": "anthropic", "model": "claude-opus-5-5"},
+    {"provider": "openai", "model": "gpt-5"},
+    {"provider": "google", "model": "gemini-2.5-pro"}
+  ],
+  "judges": {
+    "numbers": {"provider": "openai", "model": "gpt-5"},
+    "calculation": {"provider": "anthropic", "model": "claude-opus-5-5", "effort": "high"},
+    "plausibility": {"provider": "google", "model": "gemini-2.5-pro"}
+  },
+  "sample": {"share": 0.2, "minimum": 30, "seed": 42},
+  "parallel": 4
+}

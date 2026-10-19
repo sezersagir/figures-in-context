@@ -4,7 +4,7 @@
 
 The model answers questions about realistic business documents. Python checks every result exactly against a reference solution, three LLM judges diagnose *why* an answer went wrong, and a human confirms.
 
-![Run overview in the web app](bilder/app-lauf.png)
+![Run overview in the web app](docs/images/app-run.png)
 
 ## How it works
 
@@ -28,7 +28,7 @@ Python 3.9+ and nothing else: no dependencies, no `pip install`.
 python -m figures_in_context app        # web app on http://127.0.0.1:8765
 ```
 
-On Windows, double-click `starten.bat`. In the web app you enter API keys (stored only in a local `.env`), pick models, start runs with live progress, review flagged cases and open the report. A live log next to each run lists every request as it comes back: test case, model or judge, result or verdict, duration, tokens and retries, with errors in red. It is saved per run in `protokoll.jsonl`. To try it for free, create a run with "Probelauf" ticked: built-in test models stand in for real APIs.
+On Windows, double-click `start.bat`. In the web app you enter API keys (stored only in a local `.env`), pick models, start runs with live progress, review flagged cases and open the report. A live log next to each run lists every request as it comes back: test case, model or judge, result or verdict, duration, tokens and retries, with errors in red. It is saved per run in `log.jsonl`. To try it for free, create a run with "Test run" ticked: built-in test models stand in for real APIs.
 
 Supported providers: Anthropic, OpenAI, Google Gemini (plain HTTPS calls, structured JSON output for the judges, retries with backoff).
 
@@ -41,15 +41,14 @@ python -m unittest discover tests
 | Path | Contents |
 |---|---|
 | `figures_in_context/` | pipeline (answers → check → judges → routing → review → report), web app, review UI |
-| `testfaelle/` | test cases (JSON), documents, scripts that compute the reference solutions |
-| `prompts/` | system prompts for the model under test and the three judges ([overview with example messages](prompts/UEBERSICHT.md)) |
-| `kalibrierung/` | judge calibration answers with planted errors |
+| `test_cases/` | test cases (JSON), documents, scripts that compute the reference answers |
+| `prompts/` | system prompts for the model under test and the three judges ([overview with example messages](prompts/OVERVIEW.md)) |
+| `calibration/` | judge calibration answers with planted errors |
 | `config/` | models, repetitions, sample size, unit aliases |
-| `laeufe/2026-10-18_beispiel/` | an example run with test models, including report and review screenshots |
-| `SPEZIFIKATION.md`, `architektur/` | concept and technical design (German) |
-| `ANLEITUNG.md` | user guide (German) |
+| `runs/2026-10-19_example/` | an example run with test models, including log, review results and report |
+| `docs/` | [user guide](docs/USER_GUIDE.md), [concept](docs/SPEC.md) and [technical design](docs/ARCHITECTURE.md) |
 
-![Review of a flagged case](bilder/app-review.png)
+![Review of a flagged case](docs/images/app-review.png)
 
 ## Status
 

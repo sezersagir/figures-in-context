@@ -1,0 +1,16 @@
+﻿case_no;case_id;model;repetition;reason
+1;FC-006;test:correct;1;flagged
+2;FC-002;test:random;1;sample
+3;FC-009;test:correct;1;flagged
+4;FC-007;test:correct;1;flagged
+5;FC-006;test:random;1;sample
+6;FC-001;test:correct;1;sample
+7;FC-004;test:correct;1;flagged
+8;FC-003;test:correct;1;flagged
+9;FC-008;test:correct;1;flagged
+10;FC-011;test:random;1;flagged
+11;FC-002;test:correct;1;flagged
+12;FC-011;test:correct;1;flagged
+13;FC-004;test:random;1;flagged
+14;FC-005;test:random;1;flagged
+15;FC-010;test:correct;1;flagged

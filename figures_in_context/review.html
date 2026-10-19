@@ -1,291 +1,292 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Figures in Context Review</title>
 <style>
 :root{
-  --tinte:#1B2430; --schiefer:#5B6672; --linie:#D5DBE1; --grund:#EEF1F4; --blatt:#FFFFFF;
-  --gruen:#2E6B4F; --gruen-hell:#E3F0E8; --rot:#B3261E; --rot-hell:#F8E3E1; --bernstein:#C98A1B;
+  --ink:#1B2430; --slate:#5B6672; --line:#D5DBE1; --ground:#EEF1F4; --paper:#FFFFFF;
+  --green:#2E6B4F; --green-light:#E3F0E8; --red:#B3261E; --red-light:#F8E3E1; --amber:#C98A1B;
   --mono:ui-monospace,"SF Mono","Cascadia Mono","Segoe UI Mono",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{background:var(--grund);color:var(--tinte);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{background:var(--ground);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 button,input,textarea{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--bernstein);outline-offset:2px}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 
-.kopf{display:flex;align-items:center;gap:1.25rem;padding:.6rem 1.25rem;background:var(--tinte);color:#fff}
-.kopf h1{font-size:1rem;font-weight:600;margin:0;white-space:nowrap}
-.fortschritt{flex:1;display:flex;align-items:center;gap:.75rem;min-width:0}
-.balken{flex:1;height:6px;background:#3A4656;border-radius:3px;overflow:hidden}
-.balken i{display:block;height:100%;background:#7FC29B;width:0;transition:width .3s}
-.fortschritt span{font-size:.85rem;white-space:nowrap;color:#C9D1DA}
-.kopf label{font-size:.85rem;color:#C9D1DA;display:flex;align-items:center;gap:.4rem}
-.kopf input{background:#2A3544;border:1px solid #3A4656;border-radius:4px;padding:.2rem .5rem;color:#fff;width:9rem}
+.head{display:flex;align-items:center;gap:1.25rem;padding:.6rem 1.25rem;background:var(--ink);color:#fff}
+.head h1{font-size:1rem;font-weight:600;margin:0;white-space:nowrap}
+.progress{flex:1;display:flex;align-items:center;gap:.75rem;min-width:0}
+.bar{flex:1;height:6px;background:#3A4656;border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:#7FC29B;width:0;transition:width .3s}
+.progress span{font-size:.85rem;white-space:nowrap;color:#C9D1DA}
+.head label{font-size:.85rem;color:#C9D1DA;display:flex;align-items:center;gap:.4rem}
+.head input{background:#2A3544;border:1px solid #3A4656;border-radius:4px;padding:.2rem .5rem;color:#fff;width:9rem}
 
-.rahmen{display:grid;grid-template-columns:13rem 1fr;height:calc(100% - 46px)}
-.liste{overflow:auto;border-right:1px solid var(--linie);background:var(--blatt)}
-.liste button{display:flex;align-items:center;gap:.6rem;width:100%;border:0;background:none;padding:.45rem .9rem;text-align:left;cursor:pointer;font-variant-numeric:tabular-nums}
-.liste button:hover{background:var(--grund)}
-.liste button[aria-current="true"]{background:#DCE3EA;font-weight:600}
-.punkt{width:.6rem;height:.6rem;border-radius:50%;border:1.5px solid var(--schiefer);flex:none}
-.punkt.ok{background:var(--gruen);border-color:var(--gruen)}
-.punkt.fehler{background:var(--rot);border-color:var(--rot)}
-.liste small{color:var(--schiefer);margin-left:auto}
+.frame{display:grid;grid-template-columns:13rem 1fr;height:calc(100% - 46px)}
+.list{overflow:auto;border-right:1px solid var(--line);background:var(--paper)}
+.list button{display:flex;align-items:center;gap:.6rem;width:100%;border:0;background:none;padding:.45rem .9rem;text-align:left;cursor:pointer;font-variant-numeric:tabular-nums}
+.list button:hover{background:var(--ground)}
+.list button[aria-current="true"]{background:#DCE3EA;font-weight:600}
+.dot{width:.6rem;height:.6rem;border-radius:50%;border:1.5px solid var(--slate);flex:none}
+.dot.ok{background:var(--green);border-color:var(--green)}
+.dot.error{background:var(--red);border-color:var(--red)}
+.list small{color:var(--slate);margin-left:auto}
 
 main{overflow:auto;padding:1.5rem 2rem 9rem}
-.fall{max-width:68rem}
-.frage{font-size:1.15rem;line-height:1.45;margin:.25rem 0 1.25rem;max-width:60rem}
-.meta{color:var(--schiefer);font-size:.85rem}
+.case{max-width:68rem}
+.question{font-size:1.15rem;line-height:1.45;margin:.25rem 0 1.25rem;max-width:60rem}
+.meta{color:var(--slate);font-size:.85rem}
 
-/* Der Kern: Musterlösung und KI-Ergebnis Ziffer für Ziffer */
-.vergleich{background:var(--blatt);border:1px solid var(--linie);border-radius:6px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:grid;grid-template-columns:auto 1fr;gap:.35rem 1.25rem;align-items:baseline}
-.vergleich dt{color:var(--schiefer);font-size:.85rem}
-.vergleich dd{margin:0;font-family:var(--mono);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em;white-space:pre}
-.vergleich dd .x{background:var(--rot-hell);color:var(--rot);border-radius:2px}
-.vergleich .einheit{font-size:1rem;color:var(--schiefer);margin-left:.4rem}
-.urteil{grid-column:1/-1;font-size:.9rem;font-weight:600;margin-top:.25rem}
-.urteil.richtig{color:var(--gruen)} .urteil.falsch{color:var(--rot)}
+/* The core: reference answer and AI result digit by digit */
+.compare{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:grid;grid-template-columns:auto 1fr;gap:.35rem 1.25rem;align-items:baseline}
+.compare dt{color:var(--slate);font-size:.85rem}
+.compare dd{margin:0;font-family:var(--mono);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em;white-space:pre}
+.compare dd .x{background:var(--red-light);color:var(--red);border-radius:2px}
+.compare .unit{font-size:1rem;color:var(--slate);margin-left:.4rem}
+.outcome{grid-column:1/-1;font-size:.9rem;font-weight:600;margin-top:.25rem}
+.outcome.correct{color:var(--green)} .outcome.wrong{color:var(--red)}
 
-.spalten{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:1.25rem}
-section h2{font-size:.9rem;font-weight:600;color:var(--schiefer);margin:0 0 .4rem}
-.antwort{background:var(--blatt);border:1px solid var(--linie);border-radius:6px;padding:1rem 1.1rem;white-space:pre-wrap;font-size:.92rem;line-height:1.55;max-height:32rem;overflow:auto}
-.befund{background:var(--blatt);border:1px solid var(--linie);border-left:4px solid var(--linie);border-radius:4px;padding:.55rem .8rem;margin-bottom:.5rem;font-size:.9rem}
-.befund.flag{border-left-color:var(--rot)}
-.befund.ok{border-left-color:var(--gruen)}
-.befund b{font-weight:600}
-.befund .typ{font-family:var(--mono);font-size:.8rem;color:var(--rot);margin-left:.35rem}
-.fallen{margin:.25rem 0 0;padding-left:1.1rem;font-size:.9rem}
-.fallen li{margin-bottom:.25rem}
+.columns{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:1.25rem}
+section h2{font-size:.9rem;font-weight:600;color:var(--slate);margin:0 0 .4rem}
+.answer{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;white-space:pre-wrap;font-size:.92rem;line-height:1.55;max-height:32rem;overflow:auto}
+.finding{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:4px;padding:.55rem .8rem;margin-bottom:.5rem;font-size:.9rem}
+.finding.flag{border-left-color:var(--red)}
+.finding.ok{border-left-color:var(--green)}
+.finding b{font-weight:600}
+.finding .type{font-family:var(--mono);font-size:.8rem;color:var(--red);margin-left:.35rem}
+.traps{margin:.25rem 0 0;padding-left:1.1rem;font-size:.9rem}
+.traps li{margin-bottom:.25rem}
 
 details{margin-top:1.25rem}
-summary{cursor:pointer;color:var(--schiefer);font-size:.9rem}
-.dokument{background:var(--blatt);border:1px solid var(--linie);border-radius:6px;padding:1rem 1.1rem;white-space:pre-wrap;font-family:var(--mono);font-size:.8rem;line-height:1.5;margin-top:.5rem;max-height:30rem;overflow:auto}
+summary{cursor:pointer;color:var(--slate);font-size:.9rem}
+.document{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;white-space:pre-wrap;font-family:var(--mono);font-size:.8rem;line-height:1.5;margin-top:.5rem;max-height:30rem;overflow:auto}
 
-.leiste{position:fixed;left:13rem;right:0;bottom:0;background:var(--blatt);border-top:1px solid var(--linie);padding:.75rem 2rem;display:grid;grid-template-columns:1fr auto;gap:.6rem 1.25rem;align-items:start;box-shadow:0 -4px 16px rgba(27,36,48,.06)}
-.typen{display:flex;flex-wrap:wrap;gap:.4rem}
-.typen button{border:1.5px solid var(--linie);background:var(--blatt);border-radius:999px;padding:.25rem .75rem .25rem .5rem;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:.45rem}
-.typen button kbd{font-family:var(--mono);font-size:.75rem;color:var(--schiefer);border:1px solid var(--linie);border-radius:3px;padding:0 .3rem}
-.typen button[aria-pressed="true"]{border-color:var(--rot);background:var(--rot-hell);color:var(--rot)}
-.typen .fehlerfrei{font-size:.85rem;color:var(--gruen);align-self:center;margin-left:.25rem}
-.leiste textarea{grid-column:1;width:100%;min-height:2.3rem;height:2.3rem;resize:vertical;border:1px solid var(--linie);border-radius:4px;padding:.4rem .6rem;font-size:.9rem}
-.aktionen{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:stretch;gap:.4rem}
-.weiter{background:var(--tinte);color:#fff;border:0;border-radius:5px;padding:.6rem 1.1rem;font-weight:600;cursor:pointer;white-space:nowrap}
-.weiter:hover{background:#2A3544}
-.hinweis{font-size:.78rem;color:var(--schiefer);text-align:center}
-.status{font-size:.8rem;color:var(--gruen);text-align:center;min-height:1.1em}
+.bottom{position:fixed;left:13rem;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:.75rem 2rem;display:grid;grid-template-columns:1fr auto;gap:.6rem 1.25rem;align-items:start;box-shadow:0 -4px 16px rgba(27,36,48,.06)}
+.types{display:flex;flex-wrap:wrap;gap:.4rem}
+.types button{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:.25rem .75rem .25rem .5rem;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:.45rem}
+.types button kbd{font-family:var(--mono);font-size:.75rem;color:var(--slate);border:1px solid var(--line);border-radius:3px;padding:0 .3rem}
+.types button[aria-pressed="true"]{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.types .clean{font-size:.85rem;color:var(--green);align-self:center;margin-left:.25rem}
+.bottom textarea{grid-column:1;width:100%;min-height:2.3rem;height:2.3rem;resize:vertical;border:1px solid var(--line);border-radius:4px;padding:.4rem .6rem;font-size:.9rem}
+.actions{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:stretch;gap:.4rem}
+.next{background:var(--ink);color:#fff;border:0;border-radius:5px;padding:.6rem 1.1rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.next:hover{background:#2A3544}
+.hint{font-size:.78rem;color:var(--slate);text-align:center}
+.status{font-size:.8rem;color:var(--green);text-align:center;min-height:1.1em}
 
-.fertig{max-width:36rem;margin:4rem auto;text-align:center}
-body.probe .rahmen{height:calc(100% - 46px - 1.95rem)}
-.probe-band{background:var(--bernstein);color:#2A1D05;font-size:.85rem;font-weight:600;padding:.35rem 1.25rem}
-.fertig a.weiter{display:inline-block;text-decoration:none}
-.zurueck{color:#C9D1DA;text-decoration:none;font-size:.85rem;white-space:nowrap}
-.zurueck:hover{color:#fff}
-.fertig code{font-family:var(--mono);background:var(--blatt);border:1px solid var(--linie);padding:.2rem .5rem;border-radius:4px}
+.finished{max-width:36rem;margin:4rem auto;text-align:center}
+body.test .frame{height:calc(100% - 46px - 1.95rem)}
+.test-band{background:var(--amber);color:#2A1D05;font-size:.85rem;font-weight:600;padding:.35rem 1.25rem}
+.finished a.next{display:inline-block;text-decoration:none}
+.back{color:#C9D1DA;text-decoration:none;font-size:.85rem;white-space:nowrap}
+.back:hover{color:#fff}
+.finished code{font-family:var(--mono);background:var(--paper);border:1px solid var(--line);padding:.2rem .5rem;border-radius:4px}
 
 @media (max-width:900px){
-  .kopf{flex-wrap:wrap;gap:.4rem .75rem;padding:.5rem 1rem}
-  .fortschritt{order:3;flex-basis:100%}
-  .kopf label{margin-left:auto}
-  .kopf input{width:7rem}
-  .rahmen,body.probe .rahmen{grid-template-columns:1fr;height:auto}
-  .liste{display:none}
-  .spalten{grid-template-columns:1fr}
-  .leiste{left:0;padding:.75rem 1rem;grid-template-columns:1fr}
-  .aktionen{grid-row:auto;grid-column:1}
+  .head{flex-wrap:wrap;gap:.4rem .75rem;padding:.5rem 1rem}
+  .progress{order:3;flex-basis:100%}
+  .head label{margin-left:auto}
+  .head input{width:7rem}
+  .frame,body.test .frame{grid-template-columns:1fr;height:auto}
+  .list{display:none}
+  .columns{grid-template-columns:1fr}
+  .bottom{left:0;padding:.75rem 1rem;grid-template-columns:1fr}
+  .actions{grid-row:auto;grid-column:1}
   main{padding:1rem 1rem 14rem}
-  .vergleich dd{font-size:1.2rem}
+  .compare dd{font-size:1.2rem}
 }
-@media (prefers-reduced-motion:reduce){.balken i{transition:none}}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
 <body>
-<header class="kopf">
-  <a id="zurueck" class="zurueck" href="../../" hidden>← Übersicht</a>
-  <h1 id="titel">Review</h1>
-  <div class="fortschritt"><div class="balken"><i id="balken"></i></div><span id="zaehler"></span></div>
+<header class="head">
+  <a id="back" class="back" href="../../" hidden>← Overview</a>
+  <h1 id="title">Review</h1>
+  <div class="progress"><div class="bar"><i id="bar"></i></div><span id="counter"></span></div>
   <label>Reviewer <input id="reviewer" autocomplete="name"></label>
 </header>
-<div class="probe-band" id="probe-band" hidden>Probelauf mit Testmodellen: Antworten und Judge-Urteile sind zufällig erzeugt, um den Ablauf zu üben. Die gemeldeten Fehler sind keine echten Befunde.</div>
-<div class="rahmen">
-  <nav class="liste" id="liste" aria-label="Fälle"></nav>
-  <main id="haupt"></main>
+<div class="test-band" id="test-band" hidden>Test run with test models: answers and judge verdicts are generated at random so you can practise the flow. The reported errors are not real findings.</div>
+<div class="frame">
+  <nav class="list" id="list" aria-label="Cases"></nav>
+  <main id="main"></main>
 </div>
-<div class="leiste" id="leiste" hidden>
-  <div class="typen" id="typen" role="group" aria-label="Fehlertypen"></div>
-  <textarea id="kommentar" placeholder="Kommentar (optional)"></textarea>
-  <div class="aktionen">
-    <button class="weiter" id="weiter">Geprüft, weiter</button>
-    <div class="hinweis">Enter · Ziffern 1–5 · ← →</div>
+<div class="bottom" id="bottom" hidden>
+  <div class="types" id="types" role="group" aria-label="Error types"></div>
+  <textarea id="comment" placeholder="Comment (optional)"></textarea>
+  <div class="actions">
+    <button class="next" id="next">Checked, next</button>
+    <div class="hint">Enter · keys 1–5 · ← →</div>
     <div class="status" id="status" aria-live="polite"></div>
   </div>
 </div>
 
 <script>
-const NAMEN = {
-  falsches_ergebnis: "Falsches Ergebnis",
-  falsche_quelle: "Falsche Quelle",
-  erfundene_zahl: "Erfundene Zahl",
-  falsch_gerechnet: "Falsch gerechnet",
-  ausgelassene_information: "Ausgelassene Info",
+const NAMES = {
+  wrong_result: "Wrong result",
+  wrong_source: "Wrong source",
+  invented_number: "Invented number",
+  calculation_error: "Calculation error",
+  missing_information: "Missing information",
 };
-let FAELLE = [], TYPEN = [], aktuell = 0;
+const JUDGES = {numbers: "Numbers judge", calculation: "Calculation judge", plausibility: "Plausibility judge"};
+let CASES = [], TYPES = [], current = 0;
 const $ = id => document.getElementById(id);
 
-function speicherLokal(k, v){ try{ localStorage.setItem(k, v) }catch(e){} }
-function ladeLokal(k){ try{ return localStorage.getItem(k) || "" }catch(e){ return "" } }
+function storeLocal(k, v){ try{ localStorage.setItem(k, v) }catch(e){} }
+function loadLocal(k){ try{ return localStorage.getItem(k) || "" }catch(e){ return "" } }
 
-function typenVon(f){ return (f.fehlertypen_final || "").split(",").filter(Boolean) }
+function typesOf(c){ return (c.final_error_types || "").split(",").filter(Boolean) }
 
-function kiWert(f){
-  const m = /KI:\s*(\S+)\s*(.*)\)\s*$/.exec(f.python_ergebnis || "");
-  return m ? {wert: m[1], einheit: m[2]} : {wert: "", einheit: ""};
+function aiValue(c){
+  const m = /AI:\s*(\S+)\s*(.*)\)\s*$/.exec(c.python_result || "");
+  return m ? {value: m[1], unit: m[2]} : {value: "", unit: ""};
 }
-function teile(s){ const [a, b=""] = s.split("."); return {a, b} }
+function parts(s){ const [a, b=""] = s.split("."); return {a, b} }
 
-// Beide Zahlen am Dezimalpunkt ausrichten und im KI-Ergebnis die abweichenden Ziffern markieren.
-function ausgerichtet(soll, ist){
-  const S = teile(soll), I = teile(ist);
-  const vorne = Math.max(S.a.length, I.a.length), hinten = Math.max(S.b.length, I.b.length);
-  const form = t => t.a.padStart(vorne, " ") + (hinten ? (t.b ? "." : " ") + t.b.padEnd(hinten, " ") : "");
-  const fs = form(S), fi = form(I);
+// Align both numbers on the decimal point and mark the digits in the AI result that differ.
+function aligned(expected, actual){
+  const E = parts(expected), A = parts(actual);
+  const front = Math.max(E.a.length, A.a.length), back = Math.max(E.b.length, A.b.length);
+  const form = t => t.a.padStart(front, " ") + (back ? (t.b ? "." : " ") + t.b.padEnd(back, " ") : "");
+  const fe = form(E), fa = form(A);
   const mark = (x, y) => [...x].map((c, i) => c !== y[i] && c !== " " ? `<span class="x">${c}</span>` : esc(c)).join("");
-  return [esc(fs), mark(fi, fs)];
+  return [esc(fe), mark(fa, fe)];
 }
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])) }
 
-function zeigeListe(){
-  $("liste").innerHTML = FAELLE.map((f, i) => {
-    const klasse = f.geprueft ? (typenVon(f).length ? "fehler" : "ok") : "";
-    return `<button data-i="${i}" aria-current="${i === aktuell}"><span class="punkt ${klasse}"></span>Fall ${esc(f.fall_nr)}<small>${esc(f.testfall_id)}</small></button>`;
+function showList(){
+  $("list").innerHTML = CASES.map((c, i) => {
+    const state = c.checked ? (typesOf(c).length ? "error" : "ok") : "";
+    return `<button data-i="${i}" aria-current="${i === current}"><span class="dot ${state}"></span>Case ${esc(c.case_no)}<small>${esc(c.case_id)}</small></button>`;
   }).join("");
-  const n = FAELLE.filter(f => f.geprueft).length;
-  $("zaehler").textContent = `${n} von ${FAELLE.length} geprüft`;
-  $("balken").style.width = (FAELLE.length ? 100 * n / FAELLE.length : 0) + "%";
+  const n = CASES.filter(c => c.checked).length;
+  $("counter").textContent = `${n} of ${CASES.length} checked`;
+  $("bar").style.width = (CASES.length ? 100 * n / CASES.length : 0) + "%";
 }
 
-function zeigeFall(){
-  if (!FAELLE.length){
-    $("haupt").innerHTML = `<div class="fertig"><h2>Keine Fälle zum Prüfen</h2><p>In diesem Lauf hat nichts ein Review gebraucht.</p></div>`;
-    $("leiste").hidden = true; return;
+function showCase(){
+  if (!CASES.length){
+    $("main").innerHTML = `<div class="finished"><h2>No cases to check</h2><p>Nothing in this run needed a review.</p></div>`;
+    $("bottom").hidden = true; return;
   }
-  const f = FAELLE[aktuell];
-  const [mw, me] = (f.musterloesung || "").split(/\s+(.*)/);
-  const ki = kiWert(f);
-  const [sollHtml, istHtml] = ausgerichtet(mw || "", ki.wert);
-  const richtig = (f.python_ergebnis || "").startsWith("richtig");
-  const befunde = (f.judge_befunde || "").split("\n").filter(Boolean).map(z => {
-    const m = /^\[(\w+)\]\s+(FLAG|ok)\s*([\w,]*):\s*(.*)$/s.exec(z);
-    if (!m) return `<div class="befund">${esc(z)}</div>`;
-    const name = {zahlen:"Zahlen-Judge", rechenweg:"Rechenweg-Judge", plausibilitaet:"Plausibilitäts-Judge"}[m[1]] || m[1];
-    const typ = m[3] ? `<span class="typ">${esc(m[3])}</span>` : "";
-    return `<div class="befund ${m[2] === "FLAG" ? "flag" : "ok"}"><b>${name}</b> ${m[2] === "FLAG" ? "meldet" : "ok"}${typ}<br>${esc(m[4])}</div>`;
+  const c = CASES[current];
+  const [refValue, refUnit] = (c.reference_answer || "").split(/\s+(.*)/);
+  const ai = aiValue(c);
+  const [expectedHtml, actualHtml] = aligned(refValue || "", ai.value);
+  const correct = (c.python_result || "").startsWith("correct");
+  const findings = (c.judge_findings || "").split("\n").filter(Boolean).map(line => {
+    const m = /^\[(\w+)\]\s+(FLAG|ok)\s*([\w,]*):\s*(.*)$/s.exec(line);
+    if (!m) return `<div class="finding">${esc(line)}</div>`;
+    const name = JUDGES[m[1]] || m[1];
+    const type = m[3] ? `<span class="type">${esc(m[3])}</span>` : "";
+    return `<div class="finding ${m[2] === "FLAG" ? "flag" : "ok"}"><b>${name}</b> ${m[2] === "FLAG" ? "reports" : "ok"}${type}<br>${esc(m[4])}</div>`;
   }).join("");
-  const fallen = (f.fallen || "").split(" | ").filter(Boolean).map(x => `<li>${esc(x)}</li>`).join("");
+  const traps = (c.traps || "").split(" | ").filter(Boolean).map(x => `<li>${esc(x)}</li>`).join("");
 
-  $("haupt").innerHTML = `<article class="fall">
-    <div class="meta">Fall ${esc(f.fall_nr)} von ${FAELLE.length} · Testfall ${esc(f.testfall_id)}</div>
-    <p class="frage">${esc(f.frage)}</p>
-    <dl class="vergleich">
-      <dt>Musterlösung</dt><dd>${sollHtml}<span class="einheit">${esc(me || "")}</span></dd>
-      <dt>KI-Ergebnis</dt><dd>${istHtml}<span class="einheit">${esc(ki.einheit)}</span></dd>
-      <div class="urteil ${richtig ? "richtig" : "falsch"}">${richtig ? "Python-Check: Ergebnis stimmt" : "Python-Check: Ergebnis falsch"}</div>
+  $("main").innerHTML = `<article class="case">
+    <div class="meta">Case ${esc(c.case_no)} of ${CASES.length} · test case ${esc(c.case_id)}</div>
+    <p class="question">${esc(c.question)}</p>
+    <dl class="compare">
+      <dt>Reference answer</dt><dd>${expectedHtml}<span class="unit">${esc(refUnit || "")}</span></dd>
+      <dt>AI result</dt><dd>${actualHtml}<span class="unit">${esc(ai.unit)}</span></dd>
+      <div class="outcome ${correct ? "correct" : "wrong"}">${correct ? "Python check: result is correct" : "Python check: result is wrong"}</div>
     </dl>
-    <div class="spalten">
-      <section><h2>Antwort der KI</h2><div class="antwort">${esc(f.antwort_text)}</div></section>
-      <section><h2>Befunde der Judges</h2>${befunde}
-        ${fallen ? `<h2 style="margin-top:1rem">Bekannte Fallen in diesem Testfall</h2><ul class="fallen">${fallen}</ul>` : ""}
+    <div class="columns">
+      <section><h2>The AI's answer</h2><div class="answer">${esc(c.answer_text)}</div></section>
+      <section><h2>Judge findings</h2>${findings}
+        ${traps ? `<h2 style="margin-top:1rem">Known traps in this test case</h2><ul class="traps">${traps}</ul>` : ""}
       </section>
     </div>
-    <details id="dok"><summary>Dokument anzeigen (${esc(f.dokument_datei)}, Seite ${esc(f.dokument_seite)}) · Taste D</summary><div class="dokument">${esc(f.dokument)}</div></details>
+    <details id="doc"><summary>Show document (${esc(c.document_file)}, page ${esc(c.document_page)}) · key D</summary><div class="document">${esc(c.document)}</div></details>
   </article>`;
-  $("haupt").scrollTop = 0;
-  $("leiste").hidden = false;
-  zeigeTypen();
-  $("kommentar").value = f.kommentar || "";
-  $("status").textContent = f.geprueft ? "Bereits geprüft" : "";
-  zeigeListe();
+  $("main").scrollTop = 0;
+  $("bottom").hidden = false;
+  showTypes();
+  $("comment").value = c.comment || "";
+  $("status").textContent = c.checked ? "Already checked" : "";
+  showList();
 }
 
-function zeigeTypen(){
-  const gewaehlt = typenVon(FAELLE[aktuell]);
-  $("typen").innerHTML = TYPEN.map((t, i) =>
-    `<button data-typ="${t}" aria-pressed="${gewaehlt.includes(t)}"><kbd>${i + 1}</kbd>${NAMEN[t] || t}</button>`
-  ).join("") + (gewaehlt.length ? "" : `<span class="fehlerfrei">Keine Fehler gewählt: zählt als fehlerfrei</span>`);
+function showTypes(){
+  const chosen = typesOf(CASES[current]);
+  $("types").innerHTML = TYPES.map((t, i) =>
+    `<button data-type="${t}" aria-pressed="${chosen.includes(t)}"><kbd>${i + 1}</kbd>${NAMES[t] || t}</button>`
+  ).join("") + (chosen.length ? "" : `<span class="clean">No errors chosen: counts as clean</span>`);
 }
 
-async function speichere(geprueft){
-  const f = FAELLE[aktuell];
-  f.kommentar = $("kommentar").value;
-  f.reviewer = $("reviewer").value;
-  if (geprueft !== undefined) f.geprueft = geprueft ? "x" : "";
-  const antwort = await fetch("api/speichern", {method: "POST", headers: {"Content-Type": "application/json", "X-Figures-In-Context": "1"},
-    body: JSON.stringify({fall_nr: f.fall_nr, fehlertypen: typenVon(f), kommentar: f.kommentar, reviewer: f.reviewer, geprueft: !!f.geprueft})});
-  $("status").textContent = antwort.ok ? "Gespeichert" : "Speichern fehlgeschlagen. Läuft das Fenster von Figures in Context noch?";
-  $("status").style.color = antwort.ok ? "" : "var(--rot)";
-  return antwort.ok;
+async function save(checked){
+  const c = CASES[current];
+  c.comment = $("comment").value;
+  c.reviewer = $("reviewer").value;
+  if (checked !== undefined) c.checked = checked ? "x" : "";
+  const response = await fetch("api/save", {method: "POST", headers: {"Content-Type": "application/json", "X-Figures-In-Context": "1"},
+    body: JSON.stringify({case_no: c.case_no, error_types: typesOf(c), comment: c.comment, reviewer: c.reviewer, checked: !!c.checked})});
+  $("status").textContent = response.ok ? "Saved" : "Saving failed. Is the Figures in Context window still open?";
+  $("status").style.color = response.ok ? "" : "var(--red)";
+  return response.ok;
 }
 
-function umschalten(t){
-  const f = FAELLE[aktuell], liste = typenVon(f);
-  f.fehlertypen_final = (liste.includes(t) ? liste.filter(x => x !== t) : [...liste, t]).join(",");
-  zeigeTypen(); speichere();
+function toggle(t){
+  const c = CASES[current], list = typesOf(c);
+  c.final_error_types = (list.includes(t) ? list.filter(x => x !== t) : [...list, t]).join(",");
+  showTypes(); save();
 }
 
-function gehe(i){
-  if (i < 0 || i >= FAELLE.length) return;
-  aktuell = i; zeigeFall();
+function go(i){
+  if (i < 0 || i >= CASES.length) return;
+  current = i; showCase();
 }
 
-async function weiter(){
-  if (!(await speichere(true))) return;
-  const naechster = FAELLE.findIndex((f, i) => i > aktuell && !f.geprueft);
-  const offen = naechster >= 0 ? naechster : FAELLE.findIndex(f => !f.geprueft);
-  if (offen >= 0) gehe(offen);
+async function next(){
+  if (!(await save(true))) return;
+  const following = CASES.findIndex((c, i) => i > current && !c.checked);
+  const open = following >= 0 ? following : CASES.findIndex(c => !c.checked);
+  if (open >= 0) go(open);
   else {
-    zeigeListe();
-    $("haupt").innerHTML = `<div class="fertig"><h2>Alle ${FAELLE.length} Fälle geprüft</h2>
+    showList();
+    $("main").innerHTML = `<div class="finished"><h2>All ${CASES.length} cases checked</h2>
       ${IN_APP
-        ? `<p>Die Ergebnisse stehen in <code>review_ergebnis.csv</code>. Zurück in der Übersicht erstellst du den Report.</p>
-           <p><a class="weiter" href="../../#${encodeURIComponent(LAUF)}">Zur Übersicht</a></p>`
-        : `<p>Die Ergebnisse stehen in <code>review_ergebnis.csv</code>. Beende die Oberfläche im Terminal mit Strg+C und erstelle den Report:</p>
-           <p><code>python -m figures_in_context auswertung ${esc(LAUF)}</code></p>`}</div>`;
-    $("leiste").hidden = true;
+        ? `<p>The results are in <code>review_results.csv</code>. Back in the overview you can create the report.</p>
+           <p><a class="next" href="../../#${encodeURIComponent(RUN)}">To the overview</a></p>`
+        : `<p>The results are in <code>review_results.csv</code>. Stop the interface in the terminal with Ctrl+C and create the report:</p>
+           <p><code>python -m figures_in_context report ${esc(RUN)}</code></p>`}</div>`;
+    $("bottom").hidden = true;
   }
 }
 
 document.addEventListener("keydown", e => {
-  const imFeld = ["TEXTAREA", "INPUT"].includes(document.activeElement.tagName);
-  if (e.key === "Enter" && (!imFeld || e.ctrlKey || e.metaKey)) { e.preventDefault(); weiter(); return; }
-  if (imFeld || $("leiste").hidden) return;
-  if (/^[1-9]$/.test(e.key) && TYPEN[+e.key - 1]) umschalten(TYPEN[+e.key - 1]);
-  else if (e.key === "ArrowRight") gehe(aktuell + 1);
-  else if (e.key === "ArrowLeft") gehe(aktuell - 1);
-  else if (e.key.toLowerCase() === "d") { const d = $("dok"); if (d) d.open = !d.open; }
+  const inField = ["TEXTAREA", "INPUT"].includes(document.activeElement.tagName);
+  if (e.key === "Enter" && (!inField || e.ctrlKey || e.metaKey)) { e.preventDefault(); next(); return; }
+  if (inField || $("bottom").hidden) return;
+  if (/^[1-9]$/.test(e.key) && TYPES[+e.key - 1]) toggle(TYPES[+e.key - 1]);
+  else if (e.key === "ArrowRight") go(current + 1);
+  else if (e.key === "ArrowLeft") go(current - 1);
+  else if (e.key.toLowerCase() === "d") { const d = $("doc"); if (d) d.open = !d.open; }
 });
-$("typen").addEventListener("click", e => { const b = e.target.closest("button"); if (b) umschalten(b.dataset.typ) });
-$("liste").addEventListener("click", e => { const b = e.target.closest("button"); if (b) gehe(+b.dataset.i) });
-$("weiter").addEventListener("click", weiter);
-$("kommentar").addEventListener("change", () => speichere());
-$("reviewer").addEventListener("change", () => speicherLokal("reviewer", $("reviewer").value));
+$("types").addEventListener("click", e => { const b = e.target.closest("button"); if (b) toggle(b.dataset.type) });
+$("list").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(+b.dataset.i) });
+$("next").addEventListener("click", next);
+$("comment").addEventListener("change", () => save());
+$("reviewer").addEventListener("change", () => storeLocal("reviewer", $("reviewer").value));
 
 const IN_APP = location.pathname.startsWith("/review/");
-let LAUF = "<lauf>";
-fetch("api/faelle").then(r => r.json()).then(d => {
-  if (!d.faelle) throw new Error(d.fehler);
-  LAUF = d.lauf;
-  if (d.test) { $("probe-band").hidden = false; document.body.classList.add("probe"); }
-  if (IN_APP) { $("zurueck").hidden = false; $("zurueck").href = "../../#" + encodeURIComponent(LAUF); }
-  FAELLE = d.faelle; TYPEN = d.fehlertypen;
-  document.title = "Figures in Context Review – " + d.lauf;
-  $("titel").textContent = "Review " + d.lauf;
-  $("reviewer").value = ladeLokal("reviewer") || (FAELLE.find(f => f.reviewer) || {}).reviewer || "";
-  const offen = FAELLE.findIndex(f => !f.geprueft);
-  aktuell = offen >= 0 ? offen : 0;
-  zeigeFall();
-}).catch(e => { $("haupt").innerHTML = `<div class="fertig"><h2>Review nicht verfügbar</h2><p>${e.message && e.message !== "Failed to fetch" ? esc(e.message) : "Keine Verbindung. Läuft das Fenster mit Figures in Context noch?"}</p></div>`; $("leiste").hidden = true; });
+let RUN = "<run>";
+fetch("api/cases").then(r => r.json()).then(d => {
+  if (!d.cases) throw new Error(d.error);
+  RUN = d.run;
+  if (d.test) { $("test-band").hidden = false; document.body.classList.add("test"); }
+  if (IN_APP) { $("back").hidden = false; $("back").href = "../../#" + encodeURIComponent(RUN); }
+  CASES = d.cases; TYPES = d.error_types;
+  document.title = "Figures in Context Review – " + d.run;
+  $("title").textContent = "Review " + d.run;
+  $("reviewer").value = loadLocal("reviewer") || (CASES.find(c => c.reviewer) || {}).reviewer || "";
+  const open = CASES.findIndex(c => !c.checked);
+  current = open >= 0 ? open : 0;
+  showCase();
+}).catch(e => { $("main").innerHTML = `<div class="finished"><h2>Review not available</h2><p>${e.message && e.message !== "Failed to fetch" ? esc(e.message) : "No connection. Is the Figures in Context window still open?"}</p></div>`; $("bottom").hidden = true; });
 </script>
 </body>
 </html>

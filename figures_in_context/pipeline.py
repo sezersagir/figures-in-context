@@ -1,122 +1,122 @@
-"""Gemeinsame Abläufe für Kommandozeile und Web-App: Lauf anlegen, laden, starten, Testfälle prüfen."""
+"""Shared steps for the command line and the web app: create, load and start runs, check test cases."""
 
 import json
 import re
 from datetime import date
 
-from . import antworten, check, daten, judges, weiterleitung
+from . import answers, check, data, judges, routing
 
-PROMPTS = ["testobjekt", "judge_zahlen", "judge_rechenweg", "judge_plausibilitaet"]
-LAUFORDNER = daten.BASIS / "laeufe"
+PROMPTS = ["model_under_test", "judge_numbers", "judge_calculation", "judge_plausibility"]
+RUNS_DIR = data.BASE / "runs"
 
 
-class LaufFehler(Exception):
+class RunError(Exception):
     pass
 
 
-def neu(name, test=False):
+def new(name, test=False):
     name = re.sub(r"[^\w-]+", "-", name.strip()).strip("-")
     if not name:
-        raise LaufFehler("Bitte einen Namen angeben, z. B. pilot.")
-    config = daten.lade_config()
+        raise RunError("Please enter a name, e.g. pilot.")
+    config = data.load_config()
     if test:
-        config["testobjekte"] = [{"anbieter": "test", "modell": "zufall"}, {"anbieter": "test", "modell": "richtig"}]
-        config["judges"] = {j: {"anbieter": "test", "modell": f"judge-{j}"} for j in config["judges"]}
-        config["stichprobe"]["minimum"] = 3
-    ordner = LAUFORDNER / f"{date.today().isoformat()}_{name}"
-    if ordner.exists():
-        raise LaufFehler(f"Den Lauf {ordner.name} gibt es schon. Läufe werden nie überschrieben, bitte anderen Namen wählen.")
-    testfaelle = daten.lade_testfaelle(config["testfaelle"])
-    ordner.mkdir(parents=True)
+        config["models_under_test"] = [{"provider": "test", "model": "random"}, {"provider": "test", "model": "correct"}]
+        config["judges"] = {j: {"provider": "test", "model": f"judge-{j}"} for j in config["judges"]}
+        config["sample"]["minimum"] = 3
+    run_dir = RUNS_DIR / f"{date.today().isoformat()}_{name}"
+    if run_dir.exists():
+        raise RunError(f"The run {run_dir.name} already exists. Runs are never overwritten, please pick another name.")
+    cases = data.load_test_cases(config["test_cases"])
+    run_dir.mkdir(parents=True)
     config["test"] = test
-    config["protokoll"] = {
-        "prompt_hashes": {p: daten.text_hash(daten.lade_prompt(p)) for p in PROMPTS},
-        "testfaelle": sorted(testfaelle),
-        "testfaelle_hash": daten.text_hash(json.dumps(testfaelle, sort_keys=True, ensure_ascii=False)),
+    config["record"] = {
+        "prompt_hashes": {p: data.text_hash(data.load_prompt(p)) for p in PROMPTS},
+        "test_cases": sorted(cases),
+        "test_cases_hash": data.text_hash(json.dumps(cases, sort_keys=True, ensure_ascii=False)),
     }
-    (ordner / "lauf.json").write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
-    return ordner
+    (run_dir / "run.json").write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+    return run_dir
 
 
-def lade_lauf(name, warnen=True):
-    ordner = LAUFORDNER / name
-    if "/" in name or "\\" in name or ".." in name or not (ordner / "lauf.json").exists():
-        raise LaufFehler(f"Lauf {name} nicht gefunden.")
-    config = daten.lade_json(ordner / "lauf.json")
-    testfaelle = daten.lade_testfaelle(config["testfaelle"])
-    if warnen:
-        aktuell = {p: daten.text_hash(daten.lade_prompt(p)) for p in PROMPTS}
-        if aktuell != config["protokoll"]["prompt_hashes"]:
-            daten.protokoll(ordner, "warnung", "WARNUNG: Die Prompts wurden seit dem Anlegen des Laufs geändert. "
-                        "Für vergleichbare Ergebnisse einen neuen Lauf anlegen.")
-        if sorted(testfaelle) != config["protokoll"]["testfaelle"]:
-            daten.protokoll(ordner, "warnung", "WARNUNG: Die Testfälle haben sich seit dem Anlegen des Laufs geändert.")
-    return ordner, config, testfaelle
+def load_run(name, warn=True):
+    run_dir = RUNS_DIR / name
+    if "/" in name or "\\" in name or ".." in name or not (run_dir / "run.json").exists():
+        raise RunError(f"Run {name} not found.")
+    config = data.load_json(run_dir / "run.json")
+    cases = data.load_test_cases(config["test_cases"])
+    if warn:
+        current = {p: data.text_hash(data.load_prompt(p)) for p in PROMPTS}
+        if current != config["record"]["prompt_hashes"]:
+            data.log(run_dir, "warning", "WARNING: The prompts have changed since this run was created. "
+                                         "Create a new run for comparable results.")
+        if sorted(cases) != config["record"]["test_cases"]:
+            data.log(run_dir, "warning", "WARNING: The test cases have changed since this run was created.")
+    return run_dir, config, cases
 
 
-def alle_laeufe():
-    if not LAUFORDNER.exists():
+def all_runs():
+    if not RUNS_DIR.exists():
         return []
-    return sorted((p.name for p in LAUFORDNER.iterdir() if (p / "lauf.json").exists()), reverse=True)
+    return sorted((p.name for p in RUNS_DIR.iterdir() if (p / "run.json").exists()), reverse=True)
 
 
-def start(ordner, config, testfaelle):
-    """Stufen 1–4. Kann beliebig oft aufgerufen werden, Vorhandenes wird nicht erneut angefragt."""
-    daten.protokoll(ordner, "info", "Lauf gestartet: " + ", ".join(f"{z['anbieter']}:{z['modell']}" for z in config["testobjekte"]))
-    ok = antworten.lauf(ordner, config, testfaelle)
-    check.lauf(ordner, testfaelle)
-    ok = judges.lauf(ordner, config, testfaelle) and ok
+def start(run_dir, config, cases):
+    """Stages 1–4. Can be called any number of times; nothing already there is requested again."""
+    data.log(run_dir, "info", "Run started: " + ", ".join(f"{t['provider']}:{t['model']}" for t in config["models_under_test"]))
+    ok = answers.run(run_dir, config, cases)
+    check.run(run_dir, cases)
+    ok = judges.run(run_dir, config, cases) and ok
     if not ok:
-        daten.protokoll(ordner, "warnung", "Nicht alle Anfragen haben geklappt. Einfach noch einmal starten, "
-                    "Vorhandenes wird nicht doppelt angefragt.")
+        data.log(run_dir, "warning", "Not all requests succeeded. Just start again; "
+                                     "nothing already there is requested twice.")
         return False
-    if (ordner / "review_ergebnis.csv").exists():
-        daten.protokoll(ordner, "info", "Review hat schon begonnen, die Review-Liste bleibt unverändert.")
+    if (run_dir / "review_results.csv").exists():
+        data.log(run_dir, "info", "The review has already begun, so the review queue stays as it is.")
         return True
-    return weiterleitung.lauf(ordner, config, testfaelle)
+    return routing.run(run_dir, config, cases)
 
 
-def pruefe():
-    """Steht jede Zahl aus verwendete_zahlen wirklich im Dokument? Stimmt die Seitenangabe?"""
-    testfaelle = daten.lade_testfaelle(daten.lade_config()["testfaelle"])
-    probleme = []
-    for t in testfaelle.values():
+def check_cases():
+    """Does every number in numbers_used really appear in the document? Is the page reference right?"""
+    cases = data.load_test_cases(data.load_config()["test_cases"])
+    problems = []
+    for t in cases.values():
         try:
-            daten.dokument_ausschnitt(t)
+            data.document_excerpt(t)
         except (ValueError, FileNotFoundError) as e:
-            probleme.append(f"{t['id']}: {e}")
+            problems.append(f"{t['id']}: {e}")
             continue
-        text = daten.ganzes_dokument(t)
-        for z in t["verwendete_zahlen"]:
-            if z["wert"] not in text:
-                probleme.append(f"{t['id']}: Zahl {z['wert']} ({z['bedeutung']}) steht nicht im Dokument")
-    return len(testfaelle), probleme
+        text = data.full_document(t)
+        for n in t["numbers_used"]:
+            if n["value"] not in text:
+                problems.append(f"{t['id']}: number {n['value']} ({n['meaning']}) is not in the document")
+    return len(cases), problems
 
 
-def kennzahlen(ordner):
-    """Zählt, wie weit ein Lauf ist. Für die Übersicht in der Web-App."""
-    config = daten.lade_json(ordner / "lauf.json")
-    n_testfaelle = len(config["protokoll"]["testfaelle"])
-    soll_antworten = n_testfaelle * len(config["testobjekte"]) * config["wiederholungen"]
-    checks = daten.lies_jsonl(ordner / "checks.jsonl")
-    gueltig = sum(1 for c in checks if c["format_ok"])
-    k = {
+def progress(run_dir):
+    """Counts how far a run has got. For the overview in the web app."""
+    config = data.load_json(run_dir / "run.json")
+    n_cases = len(config["record"]["test_cases"])
+    answers_expected = n_cases * len(config["models_under_test"]) * config["repetitions"]
+    checks = data.read_jsonl(run_dir / "checks.jsonl")
+    valid = sum(1 for c in checks if c["format_ok"])
+    p = {
         "test": config.get("test", False),
-        "testobjekte": [f"{z['anbieter']}:{z['modell']}" for z in config["testobjekte"]],
-        "antworten": len(daten.lies_jsonl(ordner / "antworten.jsonl")),
-        "antworten_soll": soll_antworten,
-        "richtig": sum(1 for c in checks if c["ergebnis_richtig"]),
-        "falsch": sum(1 for c in checks if c["format_ok"] and not c["ergebnis_richtig"]),
-        "formatfehler": len(checks) - gueltig,
-        "urteile": len(daten.lies_jsonl(ordner / "judges.jsonl")),
-        "urteile_soll": gueltig * len(config["judges"]),
-        "review_gesamt": 0,
-        "review_geprueft": 0,
-        "report": (ordner / "report.html").exists(),
+        "models": [f"{t['provider']}:{t['model']}" for t in config["models_under_test"]],
+        "answers": len(data.read_jsonl(run_dir / "answers.jsonl")),
+        "answers_expected": answers_expected,
+        "correct": sum(1 for c in checks if c["result_correct"]),
+        "wrong": sum(1 for c in checks if c["format_ok"] and not c["result_correct"]),
+        "format_errors": len(checks) - valid,
+        "verdicts": len(data.read_jsonl(run_dir / "verdicts.jsonl")),
+        "verdicts_expected": valid * len(config["judges"]),
+        "review_total": 0,
+        "review_checked": 0,
+        "report": (run_dir / "report.html").exists(),
     }
-    if (ordner / "review_queue.csv").exists():
-        from .review import lade_faelle
-        faelle = lade_faelle(ordner, {}, mit_dokument=False)
-        k["review_gesamt"] = len(faelle)
-        k["review_geprueft"] = sum(1 for f in faelle if f.get("geprueft"))
-    return k
+    if (run_dir / "review_queue.csv").exists():
+        from .review import load_cases
+        queue = load_cases(run_dir, {}, with_document=False)
+        p["review_total"] = len(queue)
+        p["review_checked"] = sum(1 for c in queue if c.get("checked"))
+    return p

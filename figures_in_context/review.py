@@ -1,9 +1,9 @@
-"""Stufe 5: Review-Oberfläche im Browser. Nur Standardbibliothek.
+"""Stage 5: Review UI in the browser. Standard library only.
 
-    python -m figures_in_context review <lauf>       (oder in der Web-App: python -m figures_in_context app)
+    python -m figures_in_context review <run>       (or in the web app: python -m figures_in_context app)
 
-Liest review_queue.csv (und, falls vorhanden, review_ergebnis.csv) und speichert jede
-Änderung sofort in review_ergebnis.csv. Die Auswertung liest genau diese Datei.
+Reads review_queue.csv (and review_results.csv, if it exists) and saves every
+change straight away to review_results.csv. The report reads exactly this file.
 """
 
 import csv
@@ -13,80 +13,80 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import daten
-from .weiterleitung import REVIEW_SPALTEN, TRENNER
+from . import data
+from .routing import DELIMITER, REVIEW_COLUMNS
 
-SEITE = Path(__file__).parent / "review.html"
+PAGE = Path(__file__).parent / "review.html"
 
 
-def _lies_csv(pfad):
-    with open(pfad, encoding="utf-8-sig", newline="") as f:
-        kopf = f.readline()
+def _read_csv(path):
+    with open(path, encoding="utf-8-sig", newline="") as f:
+        header = f.readline()
         f.seek(0)
-        trenner = ";" if kopf.count(";") >= kopf.count(",") else ","
-        return list(csv.DictReader(f, delimiter=trenner))
+        delimiter = ";" if header.count(";") >= header.count(",") else ","
+        return list(csv.DictReader(f, delimiter=delimiter))
 
 
-def lade_faelle(laufordner, testfaelle, mit_dokument=True):
-    faelle = _lies_csv(laufordner / "review_queue.csv")
-    ergebnis_pfad = laufordner / "review_ergebnis.csv"
-    if ergebnis_pfad.exists():
-        bisher = {z["fall_nr"]: z for z in _lies_csv(ergebnis_pfad)}
-        for f in faelle:
-            alt = bisher.get(f["fall_nr"])
-            if alt:
-                for feld in ("fehlertypen_final", "kommentar", "reviewer", "geprueft"):
-                    f[feld] = alt.get(feld, "")
-    if mit_dokument:
-        for f in faelle:
-            t = testfaelle.get(f["testfall_id"])
-            f["dokument"] = daten.ganzes_dokument(t) if t else ""
-            f["dokument_seite"] = str(t["dokument"]["seite"]) if t else ""
-            f["dokument_datei"] = Path(t["dokument"]["datei"]).name if t else ""
-    return faelle
+def load_cases(run_dir, cases, with_document=True):
+    queue = _read_csv(run_dir / "review_queue.csv")
+    results_path = run_dir / "review_results.csv"
+    if results_path.exists():
+        previous = {row["case_no"]: row for row in _read_csv(results_path)}
+        for c in queue:
+            old = previous.get(c["case_no"])
+            if old:
+                for field in ("final_error_types", "comment", "reviewer", "checked"):
+                    c[field] = old.get(field, "")
+    if with_document:
+        for c in queue:
+            t = cases.get(c["case_id"])
+            c["document"] = data.full_document(t) if t else ""
+            c["document_page"] = str(t["document"]["page"]) if t else ""
+            c["document_file"] = Path(t["document"]["file"]).name if t else ""
+    return queue
 
 
-def speichere(laufordner, faelle):
-    ziel = laufordner / "review_ergebnis.csv"
-    tmp = ziel.with_suffix(".tmp")
+def save(run_dir, queue):
+    target = run_dir / "review_results.csv"
+    tmp = target.with_suffix(".tmp")
     with open(tmp, "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.DictWriter(f, REVIEW_SPALTEN, delimiter=TRENNER, extrasaction="ignore")
+        w = csv.DictWriter(f, REVIEW_COLUMNS, delimiter=DELIMITER, extrasaction="ignore")
         w.writeheader()
-        w.writerows(faelle)
-    tmp.replace(ziel)
+        w.writerows(queue)
+    tmp.replace(target)
 
 
-class ReviewSitzung:
-    """Hält die Fälle eines Laufs im Speicher und schreibt jede Änderung sofort auf die Platte."""
+class ReviewSession:
+    """Keeps a run's review cases in memory and writes every change to disk straight away."""
 
-    def __init__(self, laufordner, testfaelle):
-        if not (laufordner / "review_queue.csv").exists():
-            raise FileNotFoundError("Für diesen Lauf gibt es noch keine Review-Liste. Erst den Lauf starten.")
-        self.laufordner = laufordner
-        self.faelle = lade_faelle(laufordner, testfaelle)
-        self.nach_nr = {f["fall_nr"]: f for f in self.faelle}
-        self.sperre = threading.Lock()
+    def __init__(self, run_dir, cases):
+        if not (run_dir / "review_queue.csv").exists():
+            raise FileNotFoundError("This run has no review queue yet. Start the run first.")
+        self.run_dir = run_dir
+        self.queue = load_cases(run_dir, cases)
+        self.by_no = {c["case_no"]: c for c in self.queue}
+        self.lock = threading.Lock()
 
-    def daten(self):
-        test = daten.lade_json(self.laufordner / "lauf.json").get("test", False)
-        return {"lauf": self.laufordner.name, "test": test, "fehlertypen": daten.FEHLERTYPEN, "faelle": self.faelle}
+    def data(self):
+        test = data.load_json(self.run_dir / "run.json").get("test", False)
+        return {"run": self.run_dir.name, "test": test, "error_types": data.ERROR_TYPES, "cases": self.queue}
 
-    def speichern(self, eingabe):
-        fall = self.nach_nr.get(str(eingabe.get("fall_nr")))
-        if not fall:
-            raise KeyError("unbekannter Fall")
-        typen = [t for t in eingabe.get("fehlertypen", []) if t in daten.FEHLERTYPEN]
-        with self.sperre:
-            fall["fehlertypen_final"] = ",".join(typen)
-            fall["kommentar"] = str(eingabe.get("kommentar", ""))
-            fall["reviewer"] = str(eingabe.get("reviewer", ""))
-            fall["geprueft"] = "x" if eingabe.get("geprueft") else ""
-            speichere(self.laufordner, self.faelle)
+    def save(self, payload):
+        case = self.by_no.get(str(payload.get("case_no")))
+        if not case:
+            raise KeyError("unknown case")
+        types = [t for t in payload.get("error_types", []) if t in data.ERROR_TYPES]
+        with self.lock:
+            case["final_error_types"] = ",".join(types)
+            case["comment"] = str(payload.get("comment", ""))
+            case["reviewer"] = str(payload.get("reviewer", ""))
+            case["checked"] = "x" if payload.get("checked") else ""
+            save(self.run_dir, self.queue)
 
 
-def starte(laufordner, testfaelle, port=8765, browser=True):
+def serve(run_dir, cases, port=8765, browser=True):
     try:
-        sitzung = ReviewSitzung(laufordner, testfaelle)
+        session = ReviewSession(run_dir, cases)
     except FileNotFoundError as e:
         raise SystemExit(str(e))
 
@@ -94,41 +94,41 @@ def starte(laufordner, testfaelle, port=8765, browser=True):
         def log_message(self, *args):
             pass
 
-        def _sende(self, code, inhalt, typ="application/json; charset=utf-8"):
+        def _send(self, code, body, content_type="application/json; charset=utf-8"):
             self.send_response(code)
-            self.send_header("Content-Type", typ)
+            self.send_header("Content-Type", content_type)
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
-            self.wfile.write(inhalt)
+            self.wfile.write(body)
 
         def do_GET(self):
             if self.path == "/":
-                self._sende(200, SEITE.read_bytes(), "text/html; charset=utf-8")
-            elif self.path == "/api/faelle":
-                self._sende(200, json.dumps(sitzung.daten(), ensure_ascii=False).encode("utf-8"))
+                self._send(200, PAGE.read_bytes(), "text/html; charset=utf-8")
+            elif self.path == "/api/cases":
+                self._send(200, json.dumps(session.data(), ensure_ascii=False).encode("utf-8"))
             else:
-                self._sende(404, b"{}")
+                self._send(404, b"{}")
 
         def do_POST(self):
-            if self.path != "/api/speichern":
-                return self._sende(404, b"{}")
-            laenge = int(self.headers.get("Content-Length", 0))
+            if self.path != "/api/save":
+                return self._send(404, b"{}")
+            length = int(self.headers.get("Content-Length", 0))
             try:
-                sitzung.speichern(json.loads(self.rfile.read(laenge) or b"{}"))
+                session.save(json.loads(self.rfile.read(length) or b"{}"))
             except KeyError:
-                return self._sende(400, b'{"fehler": "unbekannter Fall"}')
-            self._sende(200, b'{"ok": true}')
+                return self._send(400, b'{"error": "unknown case"}')
+            self._send(200, b'{"ok": true}')
 
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     url = f"http://127.0.0.1:{port}/"
-    print(f"Review-Oberfläche läuft: {url}")
-    print(f"Gespeichert wird automatisch in {laufordner / 'review_ergebnis.csv'}")
-    print("Beenden mit Strg+C.")
+    print(f"Review UI running: {url}")
+    print(f"Changes are saved automatically to {run_dir / 'review_results.csv'}")
+    print("Stop with Ctrl+C.")
     if browser:
         threading.Timer(0.5, lambda: webbrowser.open(url)).start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nBeendet. Danach: python -m figures_in_context auswertung " + laufordner.name)
+        print("\nStopped. Next: python -m figures_in_context report " + run_dir.name)
     finally:
         server.server_close()

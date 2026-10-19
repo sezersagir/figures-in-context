@@ -1,19 +1,19 @@
-"""Stufe 3: Drei Judges diagnostizieren jede Antwort mit gültigem Format. → judges.jsonl
+"""Stage 3: Three judges diagnose every answer with a valid format. → verdicts.jsonl
 
-Judges entscheiden nicht über richtig/falsch, das hat Python schon getan.
-Ein kaputtes oder unerlaubtes Urteil zählt als Flag, damit kein Fall still durchrutscht.
+Judges do not decide right or wrong; Python has already done that.
+A broken or disallowed verdict counts as a flag, so no case slips through silently.
 """
 
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from . import daten, modelle
+from . import data, models
 
-ERLAUBT = {
-    "zahlen": ["falsche_quelle", "erfundene_zahl"],
-    "rechenweg": ["falsch_gerechnet"],
-    "plausibilitaet": ["ausgelassene_information"],
+ALLOWED = {
+    "numbers": ["wrong_source", "invented_number"],
+    "calculation": ["calculation_error"],
+    "plausibility": ["missing_information"],
 }
 
 
@@ -22,135 +22,135 @@ def schema(judge):
         "type": "object",
         "properties": {
             "flag": {"type": "boolean"},
-            "fehlertypen": {"type": "array", "items": {"type": "string", "enum": ERLAUBT[judge]}},
-            "befund": {"type": "string"},
-            "belege": {
+            "error_types": {"type": "array", "items": {"type": "string", "enum": ALLOWED[judge]}},
+            "finding": {"type": "string"},
+            "evidence": {
                 "type": "array",
                 "items": {
                     "type": "object",
                     "properties": {
-                        "zitat_antwort": {"type": "string"},
-                        "fundstelle_dokument": {"type": "string"},
+                        "answer_quote": {"type": "string"},
+                        "document_location": {"type": "string"},
                     },
-                    "required": ["zitat_antwort", "fundstelle_dokument"],
+                    "required": ["answer_quote", "document_location"],
                     "additionalProperties": False,
                 },
             },
-            "sicherheit": {"type": "string", "enum": ["niedrig", "mittel", "hoch"]},
+            "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
         },
-        "required": ["flag", "fehlertypen", "befund", "belege", "sicherheit"],
+        "required": ["flag", "error_types", "finding", "evidence", "confidence"],
         "additionalProperties": False,
     }
 
 
-def _liste(eintraege):
-    return "\n".join(f"- {e}" for e in eintraege) or "- (none)"
+def _bullets(items):
+    return "\n".join(f"- {i}" for i in items) or "- (none)"
 
 
-def judge_text(judge, testfall, antwort, check):
-    t = testfall
-    loesung = f"{t['musterloesung']['wert']} {t['musterloesung']['einheit']}"
-    if judge == "zahlen":
-        zahlen = "\n".join(
-            f"- {z['wert']} {z['einheit']} ({z['bedeutung']}), found at: {z['fundstelle']}"
-            for z in t["verwendete_zahlen"]
+def judge_text(judge, case, answer, check):
+    t = case
+    solution = f"{t['reference_answer']['value']} {t['reference_answer']['unit']}"
+    if judge == "numbers":
+        numbers = "\n".join(
+            f"- {n['value']} {n['unit']} ({n['meaning']}), found at: {n['location']}"
+            for n in t["numbers_used"]
         )
-        teile = [
-            f"<document>\n{daten.ganzes_dokument(t)}\n</document>",
-            f"<numbers_needed_for_the_correct_solution>\n{zahlen}\n</numbers_needed_for_the_correct_solution>",
+        parts = [
+            f"<document>\n{data.full_document(t)}\n</document>",
+            f"<numbers_needed_for_the_correct_solution>\n{numbers}\n</numbers_needed_for_the_correct_solution>",
         ]
-    elif judge == "rechenweg":
-        urteil = "correct" if check["ergebnis_richtig"] else f"WRONG (answer gave {check['wert_ki']} {check['einheit_ki']})"
-        teile = [
-            f"<question>\n{t['frage']}\n</question>",
-            f"<reference_solution>{loesung}</reference_solution>",
-            f"<reference_working>\n{_liste(t['rechenweg'])}\n</reference_working>",
-            f"<known_traps>\n{_liste(t.get('fallen', []))}\n</known_traps>",
-            f"<exact_comparison_result>{urteil}</exact_comparison_result>",
+    elif judge == "calculation":
+        outcome = "correct" if check["result_correct"] else f"WRONG (answer gave {check['ai_value']} {check['ai_unit']})"
+        parts = [
+            f"<question>\n{t['question']}\n</question>",
+            f"<reference_solution>{solution}</reference_solution>",
+            f"<reference_working>\n{_bullets(t['working'])}\n</reference_working>",
+            f"<known_traps>\n{_bullets(t.get('traps', []))}\n</known_traps>",
+            f"<exact_comparison_result>{outcome}</exact_comparison_result>",
         ]
     else:
-        teile = [
-            f"<question>\n{t['frage']}\n</question>",
-            f"<required_information>\n{_liste(t['pflicht_infos'])}\n</required_information>",
+        parts = [
+            f"<question>\n{t['question']}\n</question>",
+            f"<required_information>\n{_bullets(t['required_info'])}\n</required_information>",
         ]
-    teile.append(f"<ai_answer>\n{antwort['antwort_text']}\n</ai_answer>")
-    return "\n\n".join(teile)
+    parts.append(f"<ai_answer>\n{answer['answer_text']}\n</ai_answer>")
+    return "\n\n".join(parts)
 
 
-def werte_aus(judge, roh_text):
-    """Prüft das Judge-JSON. Alles Ungültige wird zum Flag mit Grund „Judge-Fehler“."""
+def parse_verdict(judge, raw_text):
+    """Validates the judge's JSON. Anything invalid becomes a flag marked as a judge error."""
     try:
-        u = json.loads(roh_text)
-        assert isinstance(u, dict) and isinstance(u.get("flag"), bool)
-        typen = u.get("fehlertypen") or []
-        assert isinstance(typen, list)
+        v = json.loads(raw_text)
+        assert isinstance(v, dict) and isinstance(v.get("flag"), bool)
+        types = v.get("error_types") or []
+        assert isinstance(types, list)
     except (ValueError, AssertionError):
-        return {"flag": True, "fehlertypen": [], "befund": "Judge-Fehler: kein gültiges JSON.",
-                "belege": [], "sicherheit": None, "judge_fehler": True}
-    unerlaubt = [x for x in typen if x not in ERLAUBT[judge]]
-    if unerlaubt:
-        return {**u, "flag": True, "fehlertypen": [x for x in typen if x in ERLAUBT[judge]],
-                "befund": f"Judge-Fehler: unerlaubter Fehlertyp {unerlaubt}. " + str(u.get("befund", "")),
-                "judge_fehler": True}
-    # Wer einen Fehlertyp meldet, flaggt auch.
-    return {**u, "flag": u["flag"] or bool(typen), "judge_fehler": False}
+        return {"flag": True, "error_types": [], "finding": "Judge error: no valid JSON.",
+                "evidence": [], "confidence": None, "judge_error": True}
+    disallowed = [x for x in types if x not in ALLOWED[judge]]
+    if disallowed:
+        return {**v, "flag": True, "error_types": [x for x in types if x in ALLOWED[judge]],
+                "finding": f"Judge error: disallowed error type {disallowed}. " + str(v.get("finding", "")),
+                "judge_error": True}
+    # Naming an error type means flagging.
+    return {**v, "flag": v["flag"] or bool(types), "judge_error": False}
 
 
-def lauf(laufordner, config, testfaelle):
-    antworten = {daten.antwort_schluessel(a): a for a in daten.lies_jsonl(laufordner / "antworten.jsonl")}
-    checks = daten.lies_jsonl(laufordner / "checks.jsonl")
-    ziel_datei = laufordner / "judges.jsonl"
-    vorhanden = {(daten.antwort_schluessel(u), u["judge"]) for u in daten.lies_jsonl(ziel_datei)}
+def run(run_dir, config, cases):
+    answers = {data.answer_key(a): a for a in data.read_jsonl(run_dir / "answers.jsonl")}
+    checks = data.read_jsonl(run_dir / "checks.jsonl")
+    target_file = run_dir / "verdicts.jsonl"
+    existing = {(data.answer_key(v), v["judge"]) for v in data.read_jsonl(target_file)}
 
-    auftraege = []
+    jobs = []
     for c in checks:
         if not c["format_ok"]:
-            continue  # Entscheidung D: Formatfehler werden nur gezählt
-        for judge, ziel in config["judges"].items():
-            if (daten.antwort_schluessel(c), judge) not in vorhanden:
-                auftraege.append((judge, ziel, c))
+            continue  # decision D: format errors are only counted
+        for judge, target in config["judges"].items():
+            if (data.answer_key(c), judge) not in existing:
+                jobs.append((judge, target, c))
 
-    daten.protokoll(laufordner, "info", f"Judges: {len(vorhanden)} Urteile schon vorhanden, {len(auftraege)} werden angefragt.")
-    fehler = 0
-    erledigt = 0
+    data.log(run_dir, "info", f"Judges: {len(existing)} verdicts already there, {len(jobs)} to request.")
+    errors = 0
+    done = 0
 
-    def eins(auftrag):
-        nonlocal fehler, erledigt
+    def one(job):
+        nonlocal done
         try:
-            _eins(auftrag)
+            _one(job)
         finally:
-            erledigt += 1
-            daten.melde(f"Judges: {erledigt}/{len(auftraege)}")
+            done += 1
+            data.report_progress(f"Judges: {done}/{len(jobs)}")
 
-    def _eins(auftrag):
-        nonlocal fehler
-        judge, ziel, c = auftrag
-        testfall = testfaelle[c["testfall_id"]]
-        antwort = antworten[daten.antwort_schluessel(c)]
-        beginn = time.monotonic()
-        kopf = {"testfall_id": c["testfall_id"], "modell": c["modell"], "wiederholung": c["wiederholung"],
-                "judge": judge, "judge_modell": modelle.modell_name(ziel)}
+    def _one(job):
+        nonlocal errors
+        judge, target, c = job
+        case = cases[c["case_id"]]
+        answer = answers[data.answer_key(c)]
+        start = time.monotonic()
+        head = {"case_id": c["case_id"], "model": c["model"], "repetition": c["repetition"],
+                "judge": judge, "judge_model": models.model_name(target)}
         try:
-            ergebnis = modelle.frage(
-                ziel, daten.lade_prompt(f"judge_{judge}"), judge_text(judge, testfall, antwort, c),
-                schema=schema(judge), kontext={"judge": judge, **c},
+            result = models.ask(
+                target, data.load_prompt(f"judge_{judge}"), judge_text(judge, case, answer, c),
+                schema=schema(judge), context={"judge": judge, **c},
             )
         except Exception as e:
-            fehler += 1
-            daten.protokoll(laufordner, "fehler", f"  FEHLER {judge} {daten.antwort_schluessel(c)}: {type(e).__name__}: {e}",
-                            schritt="urteil", **kopf, dauer_s=round(time.monotonic() - beginn, 1))
+            errors += 1
+            data.log(run_dir, "error", f"  ERROR {judge} {data.answer_key(c)}: {type(e).__name__}: {e}",
+                     step="verdict", **head, duration_s=round(time.monotonic() - start, 1))
             return
-        urteil = werte_aus(judge, ergebnis["text"])
-        daten.haenge_an(ziel_datei, {**kopf, **urteil})
-        daten.protokoll(laufordner, "urteil", schritt="urteil", **kopf,
-                        dauer_s=round(time.monotonic() - beginn, 1), versuche=ergebnis.get("versuche", 1),
-                        tokens_rein=ergebnis["tokens_rein"], tokens_raus=ergebnis["tokens_raus"],
-                        flag=urteil["flag"], fehlertypen=urteil.get("fehlertypen", []),
-                        judge_fehler=urteil.get("judge_fehler", False), befund=str(urteil.get("befund", ""))[:400])
+        verdict = parse_verdict(judge, result["text"])
+        data.append(target_file, {**head, **verdict})
+        data.log(run_dir, "verdict", step="verdict", **head,
+                 duration_s=round(time.monotonic() - start, 1), attempts=result.get("attempts", 1),
+                 tokens_in=result["tokens_in"], tokens_out=result["tokens_out"],
+                 flag=verdict["flag"], error_types=verdict.get("error_types", []),
+                 judge_error=verdict.get("judge_error", False), finding=str(verdict.get("finding", ""))[:400])
 
     with ThreadPoolExecutor(max_workers=config.get("parallel", 4)) as pool:
-        list(pool.map(eins, auftraege))
+        list(pool.map(one, jobs))
 
-    if fehler:
-        daten.protokoll(laufordner, "warnung", f"{fehler} Judge-Anfragen fehlgeschlagen. Einfach noch einmal starten.")
-    return fehler == 0
+    if errors:
+        data.log(run_dir, "warning", f"{errors} judge requests failed. Just start again.")
+    return errors == 0

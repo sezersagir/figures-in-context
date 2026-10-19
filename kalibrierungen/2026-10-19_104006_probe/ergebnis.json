@@ -1,0 +1,191 @@
+{
+  "zahlen": {
+    "treffer": 2,
+    "soll": 9,
+    "fehlalarme": 1,
+    "sauber": 11,
+    "kaputt": 0,
+    "falscher_typ": 1,
+    "verfehlt": [
+      {
+        "kal_id": "K-002",
+        "testfall_id": "ZE-001",
+        "beschreibung": "Originalwert 2024 aus Note 4 statt restated",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-005",
+        "testfall_id": "ZE-002",
+        "beschreibung": "Mitarbeiterzahl 2024 statt 2025",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-010",
+        "testfall_id": "ZE-004",
+        "beschreibung": "Aktienzahl 290,000,000 erfunden",
+        "befund": "Testurteil."
+      },
+      {
+        "kal_id": "K-013",
+        "testfall_id": "ZE-005",
+        "beschreibung": "vorläufiger Preis 5.25 aus dem Novemberbrief",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-018",
+        "testfall_id": "ZE-007",
+        "beschreibung": "Preis 89.15 EUR/MWh erfunden",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-021",
+        "testfall_id": "ZE-008",
+        "beschreibung": "Kurs vom 30. Juni statt 30. September",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-024",
+        "testfall_id": "ZE-009",
+        "beschreibung": "Kupon 4.0 % erfunden",
+        "befund": "No problems found (test model)."
+      }
+    ],
+    "alarme": [
+      {
+        "kal_id": "K-026",
+        "testfall_id": "ZE-010",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "falsche_quelle"
+        ]
+      }
+    ],
+    "bestanden": false
+  },
+  "rechenweg": {
+    "treffer": 2,
+    "soll": 5,
+    "fehlalarme": 1,
+    "sauber": 11,
+    "kaputt": 0,
+    "falscher_typ": 0,
+    "verfehlt": [
+      {
+        "kal_id": "K-006",
+        "testfall_id": "ZE-002",
+        "beschreibung": "richtige Zahlen, Divisionsfehler (eine Ziffer verrutscht)",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-015",
+        "testfall_id": "ZE-006",
+        "beschreibung": "Rabatt auf den ganzen Betrag statt nur über der Schwelle",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-019",
+        "testfall_id": "ZE-007",
+        "beschreibung": "TWh mit Faktor 1,000 statt 1,000,000 umgerechnet",
+        "befund": "No problems found (test model)."
+      }
+    ],
+    "alarme": [
+      {
+        "kal_id": "K-007",
+        "testfall_id": "ZE-003",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "falsch_gerechnet"
+        ]
+      }
+    ],
+    "bestanden": false
+  },
+  "plausibilitaet": {
+    "treffer": 2,
+    "soll": 5,
+    "fehlalarme": 6,
+    "sauber": 11,
+    "kaputt": 0,
+    "falscher_typ": 0,
+    "verfehlt": [
+      {
+        "kal_id": "K-003",
+        "testfall_id": "ZE-001",
+        "beschreibung": "nur Ergebnis, Vergleichsbasis fehlt",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-016",
+        "testfall_id": "ZE-006",
+        "beschreibung": "richtiges Ergebnis, Bruttowert und Rabatthöhe fehlen",
+        "befund": "No problems found (test model)."
+      },
+      {
+        "kal_id": "K-030",
+        "testfall_id": "ZE-011",
+        "beschreibung": "richtiges Ergebnis, Richtung und beide Stände fehlen",
+        "befund": "No problems found (test model)."
+      }
+    ],
+    "alarme": [
+      {
+        "kal_id": "K-001",
+        "testfall_id": "ZE-001",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "ausgelassene_information"
+        ]
+      },
+      {
+        "kal_id": "K-009",
+        "testfall_id": "ZE-004",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "ausgelassene_information"
+        ]
+      },
+      {
+        "kal_id": "K-012",
+        "testfall_id": "ZE-005",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "ausgelassene_information"
+        ]
+      },
+      {
+        "kal_id": "K-017",
+        "testfall_id": "ZE-007",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "ausgelassene_information"
+        ]
+      },
+      {
+        "kal_id": "K-026",
+        "testfall_id": "ZE-010",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "ausgelassene_information"
+        ]
+      },
+      {
+        "kal_id": "K-028",
+        "testfall_id": "ZE-011",
+        "beschreibung": "fehlerfrei",
+        "befund": "Testurteil.",
+        "typen": [
+          "ausgelassene_information"
+        ]
+      }
+    ],
+    "bestanden": false
+  }
+}

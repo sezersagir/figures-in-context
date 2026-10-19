@@ -1,0 +1,221 @@
+[
+  {
+    "id": "FC-007",
+    "category": "very large numbers",
+    "difficulty": "hard",
+    "document": {
+      "file": "documents/meridian-grid-q3-2025-update.md",
+      "page": 1
+    },
+    "question": "How much did Meridian Grid Energy earn from selling electricity in the first nine months of 2025, based on the volume delivered and the average price it realised? Give the exact result in euros (EUR), without rounding.",
+    "reference_answer": {
+      "value": "3616565400",
+      "unit": "EUR",
+      "decimals": null,
+      "exact": true
+    },
+    "numbers_used": [
+      {
+        "value": "41.37",
+        "unit": "TWh",
+        "meaning": "Electricity delivered 9M 2025",
+        "location": "Page 1, Key Figures, row Electricity delivered"
+      },
+      {
+        "value": "87.42",
+        "unit": "EUR/MWh",
+        "meaning": "Average realised electricity price 9M 2025",
+        "location": "Page 1, Key Figures"
+      }
+    ],
+    "working": [
+      "TWh to MWh: 41.37 TWh = 41,370,000 MWh (1 TWh = 1,000,000 MWh)",
+      "Revenue: 41,370,000 x 87.42 = 3,616,565,400 EUR"
+    ],
+    "required_info": [
+      "States volume and price: 41.37 TWh at 87.42 EUR/MWh",
+      "The result is roughly 3.62 billion EUR"
+    ],
+    "traps": [
+      "Total revenue of 5,912 million instead of calculating",
+      "Factor 1,000 instead of 1,000,000 (TWh confused with GWh): 3,616,565.4",
+      "Figure from the CEO quote (41 TWh): 3,584,220,000",
+      "Prior-year figures (39.82 TWh, 94.10): 3,747,062,000"
+    ]
+  },
+  {
+    "id": "FC-008",
+    "category": "very large numbers",
+    "difficulty": "medium",
+    "document": {
+      "file": "documents/meridian-grid-q3-2025-update.md",
+      "page": 1
+    },
+    "question": "What was Meridian Grid Energy's market capitalisation at the end of September 2025? Give the exact result in euros (EUR), without rounding.",
+    "reference_answer": {
+      "value": "26961464480.2",
+      "unit": "EUR",
+      "decimals": null,
+      "exact": true
+    },
+    "numbers_used": [
+      {
+        "value": "1,148,273,615",
+        "unit": "shares",
+        "meaning": "Shares outstanding excl. treasury, 30 Sep 2025",
+        "location": "Page 1, Share information"
+      },
+      {
+        "value": "23.48",
+        "unit": "EUR",
+        "meaning": "XETRA closing price 30 Sep 2025",
+        "location": "Page 1, Share information"
+      }
+    ],
+    "working": [
+      "1,148,273,615 x 23.48 = 26,961,464,480.20 EUR"
+    ],
+    "required_info": [
+      "States the share count and closing price on 30 September 2025",
+      "The result is roughly 26.96 billion EUR"
+    ],
+    "traps": [
+      "The price on 30 June 2025 (21.96): 25,216,088,585.40"
+    ]
+  },
+  {
+    "id": "FC-009",
+    "category": "very large numbers",
+    "difficulty": "hard",
+    "document": {
+      "file": "documents/meridian-grid-q3-2025-update.md",
+      "page": 2
+    },
+    "question": "How much interest does Meridian Grid Energy pay to the holders of its green bond on each coupon date? Give the exact result in euros (EUR), without rounding.",
+    "reference_answer": {
+      "value": "53281250",
+      "unit": "EUR",
+      "decimals": null,
+      "exact": true
+    },
+    "numbers_used": [
+      {
+        "value": "2.75",
+        "unit": "billion EUR",
+        "meaning": "Nominal value green bond",
+        "location": "Page 2, Bond issuance"
+      },
+      {
+        "value": "3.875%",
+        "unit": "p.a.",
+        "meaning": "Coupon green bond",
+        "location": "Page 2, Bond issuance"
+      },
+      {
+        "value": "semi-annually",
+        "unit": "",
+        "meaning": "Payment frequency (twice a year)",
+        "location": "Page 2, Bond issuance"
+      }
+    ],
+    "working": [
+      "Annual interest: 2,750,000,000 x 3.875% = 106,562,500 EUR",
+      "Semi-annual: 106,562,500 / 2 = 53,281,250 EUR"
+    ],
+    "required_info": [
+      "States that the coupon is paid semi-annually (2 January and 2 July)",
+      "States the annual amount of 106,562,500 EUR"
+    ],
+    "traps": [
+      "Annual interest instead of the semi-annual payment: 106,562,500",
+      "Confused with the hybrid bond (1.25 bn, 4.125%): 51,562,500 or 25,781,250"
+    ]
+  },
+  {
+    "id": "FC-010",
+    "category": "very large numbers",
+    "difficulty": "hard",
+    "document": {
+      "file": "documents/meridian-grid-q3-2025-update.md",
+      "page": "1-2"
+    },
+    "question": "How much will Meridian Grid Energy's grid investment programme for 2025 to 2029 amount to per customer, based on the latest customer count in the report? Give the result in euros (EUR), rounded to 2 decimal places.",
+    "reference_answer": {
+      "value": "500.64",
+      "unit": "EUR",
+      "decimals": 2,
+      "exact": false
+    },
+    "numbers_used": [
+      {
+        "value": "6.25",
+        "unit": "billion EUR",
+        "meaning": "Grid investment programme 2025-2029",
+        "location": "Page 2, Grid investment programme"
+      },
+      {
+        "value": "12,483,906",
+        "unit": "customers",
+        "meaning": "Customers (supply points) 30 Sep 2025",
+        "location": "Page 1, second table"
+      }
+    ],
+    "working": [
+      "6.25 billion = 6,250,000,000 EUR",
+      "6,250,000,000 / 12,483,906 = 500.6445...",
+      "Rounded: 500.64 EUR"
+    ],
+    "required_info": [
+      "States the customer count at 30 September 2025 (12,483,906)",
+      "States the programme total of 6.25 billion EUR for 2025 to 2029"
+    ],
+    "traps": [
+      "Rounded customer count from the CEO quote (12.5 million): 500.00",
+      "Customer count at 31 Dec 2024 (12,107,455): 516.21",
+      "Only the 9M programme spending of 1,102 million: 88.27"
+    ]
+  },
+  {
+    "id": "FC-011",
+    "category": "mixed units",
+    "difficulty": "medium",
+    "document": {
+      "file": "documents/meridian-grid-q3-2025-update.md",
+      "page": "1-2"
+    },
+    "question": "By how much did Meridian Grid Energy's net financial debt change between the end of 2024 and 30 September 2025? Give the exact result in euros (EUR), as a positive number for an increase and a negative number for a decrease.",
+    "reference_answer": {
+      "value": "887000000",
+      "unit": "EUR",
+      "decimals": null,
+      "exact": true
+    },
+    "numbers_used": [
+      {
+        "value": "14.862",
+        "unit": "billion EUR",
+        "meaning": "Net financial debt 30 Sep 2025",
+        "location": "Page 1, second table"
+      },
+      {
+        "value": "13,975",
+        "unit": "million EUR",
+        "meaning": "Net financial debt 31 Dec 2024",
+        "location": "Page 1, second table"
+      }
+    ],
+    "working": [
+      "Same unit: 14.862 bn = 14,862 million",
+      "Difference: 14,862 - 13,975 = 887 million",
+      "In EUR: 887,000,000"
+    ],
+    "required_info": [
+      "Says that net financial debt increased",
+      "States both levels: 13,975 million (31 Dec 2024) and 14.862 billion (30 Sep 2025)"
+    ],
+    "traps": [
+      "Units not aligned (13,975 - 14.862): about -13,960 million",
+      "The 15.5 bn forecast instead of the actual figure: 1,525,000,000"
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+{"case_id": "FC-001", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "7.291", "ai_unit": "%", "result_correct": true}
+{"case_id": "FC-002", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "130522.25", "ai_unit": "GBP", "result_correct": true}
+{"case_id": "FC-004", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "32334339.375", "ai_unit": "GBP", "result_correct": true}
+{"case_id": "FC-003", "model": "test:random", "repetition": 1, "format_ok": false, "format_reason": "number word in the RESULT line", "ai_value": null, "ai_unit": null, "result_correct": null}
+{"case_id": "FC-008", "model": "test:random", "repetition": 1, "format_ok": false, "format_reason": "no RESULT line", "ai_value": null, "ai_unit": null, "result_correct": null}
+{"case_id": "FC-005", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "5.57", "ai_unit": "%", "result_correct": true}
+{"case_id": "FC-006", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "1345925.4", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-007", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "3616565400", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-010", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "500.641", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-009", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "53281250", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-001", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "7.29", "ai_unit": "%", "result_correct": true}
+{"case_id": "FC-003", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "34.17", "ai_unit": "%", "result_correct": true}
+{"case_id": "FC-011", "model": "test:random", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "8870000001", "ai_unit": "EUR", "result_correct": false}
+{"case_id": "FC-002", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "130522.25", "ai_unit": "GBP", "result_correct": true}
+{"case_id": "FC-005", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "5.57", "ai_unit": "%", "result_correct": true}
+{"case_id": "FC-004", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "32334339.375", "ai_unit": "GBP", "result_correct": true}
+{"case_id": "FC-007", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "3616565400", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-009", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "53281250", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-006", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "1345925.4", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-008", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "26961464480.2", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-010", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "500.64", "ai_unit": "EUR", "result_correct": true}
+{"case_id": "FC-011", "model": "test:correct", "repetition": 1, "format_ok": true, "format_reason": null, "ai_value": "887000000", "ai_unit": "EUR", "result_correct": true}

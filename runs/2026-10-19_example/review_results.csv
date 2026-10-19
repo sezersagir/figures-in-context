@@ -1,0 +1,76 @@
+﻿case_no;case_id;question;reference_answer;python_result;answer_text;traps;judge_findings;final_error_types;comment;reviewer;checked
+1;FC-006;Using the 2025 quantities given as the planning basis and the new prices, what would Brightwater Packaging Ltd's annual net invoice value be after the volume rebate? Give the exact result in euros (EUR), without rounding.;1345925.4 EUR;correct (AI: 1345925.4 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 1345925.4 EUR";Rebate on the whole amount: 1,338,425.40 | B-310 calculated as 1,240 units instead of packs | USD conversion at 1.0835 (applies only to the US subsidiary);"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] FLAG missing_information: Test run: random test verdict, not a real finding.";;;example;x
+2;FC-002;What was Halvorsen Freight Group's revenue per average employee in 2025? Give the result in pounds sterling (GBP), rounded to 2 decimal places.;130522.25 GBP;correct (AI: 130522.25 GBP);"Test run: answer from the test model, no real working.
+
+RESULT: 130522.25 GBP";Without converting millions the result would be 0.13 | The 2024 headcount (9,517) would give 134,979.51;"[calculation] ok : Test run: random test verdict (no error rolled).
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+3;FC-009;How much interest does Meridian Grid Energy pay to the holders of its green bond on each coupon date? Give the exact result in euros (EUR), without rounding.;53281250 EUR;correct (AI: 53281250 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 53281250 EUR";Annual interest instead of the semi-annual payment: 106,562,500 | Confused with the hybrid bond (1.25 bn, 4.125%): 51,562,500 or 25,781,250;"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+4;FC-007;How much did Meridian Grid Energy earn from selling electricity in the first nine months of 2025, based on the volume delivered and the average price it realised? Give the exact result in euros (EUR), without rounding.;3616565400 EUR;correct (AI: 3616565400 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 3616565400 EUR";Total revenue of 5,912 million instead of calculating | Factor 1,000 instead of 1,000,000 (TWh confused with GWh): 3,616,565.4 | Figure from the CEO quote (41 TWh): 3,584,220,000 | Prior-year figures (39.82 TWh, 94.10): 3,747,062,000;"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+5;FC-006;Using the 2025 quantities given as the planning basis and the new prices, what would Brightwater Packaging Ltd's annual net invoice value be after the volume rebate? Give the exact result in euros (EUR), without rounding.;1345925.4 EUR;correct (AI: 1345925.4 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 1345925.4 EUR";Rebate on the whole amount: 1,338,425.40 | B-310 calculated as 1,240 units instead of packs | USD conversion at 1.0835 (applies only to the US subsidiary);"[calculation] ok : Test run: random test verdict (no error rolled).
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+6;FC-001;By what percentage did Halvorsen Freight Group's revenue grow in 2025 compared with 2024? Give the result in percent, rounded to 2 decimal places.;7.29 %;correct (AI: 7.29 %);"Test run: answer from the test model, no real working.
+
+RESULT: 7.29 %";The original figure 1,211.8 from Note 4 would give 6.01%;"[calculation] ok : Test run: random test verdict (no error rolled).
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+7;FC-004;Assuming the number of shares in issue at 31 December 2025 applies to both the interim and the proposed final dividend, what is the total dividend amount for the 2025 financial year? Give the exact result in pounds sterling (GBP), without rounding.;32334339.375 GBP;correct (AI: 32334339.375 GBP);"Test run: answer from the test model, no real working.
+
+RESULT: 32334339.375 GBP";The 2024 share count (291,032,800) would give 32,741,190 | Without converting pence the result is 100 times too large | Only the final dividend of 7.85p would give 22,562,183.475 | The 2024 dividends (3.15 + 7.60) would give 30,897,257.625;"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+8;FC-003;What share of Halvorsen Freight Group's total 2025 revenue came from the Ocean Forwarding segment? Give the result in percent, rounded to 2 decimal places.;34.17 %;correct (AI: 34.17 %);"Test run: answer from the test model, no real working.
+
+RESULT: 34.17 %";Without aligning units: 438,915 / 1,284.6 gives an absurd value (about 34,167%);"[calculation] ok : Test run: random test verdict (no error rolled).
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] FLAG missing_information: Test run: random test verdict, not a real finding.";;;example;x
+9;FC-008;What was Meridian Grid Energy's market capitalisation at the end of September 2025? Give the exact result in euros (EUR), without rounding.;26961464480.2 EUR;correct (AI: 26961464480.2 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 26961464480.2 EUR";The price on 30 June 2025 (21.96): 25,216,088,585.40;"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] FLAG missing_information: Test run: random test verdict, not a real finding.";;;example;x
+10;FC-011;By how much did Meridian Grid Energy's net financial debt change between the end of 2024 and 30 September 2025? Give the exact result in euros (EUR), as a positive number for an increase and a negative number for a decrease.;887000000 EUR;WRONG (AI: 8870000001 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 8870000001 EUR";Units not aligned (13,975 - 14.862): about -13,960 million | The 15.5 bn forecast instead of the actual figure: 1,525,000,000;"[calculation] ok : Test run: random test verdict (no error rolled).
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] FLAG missing_information: Test run: random test verdict, not a real finding.";wrong_result;;example;x
+11;FC-002;What was Halvorsen Freight Group's revenue per average employee in 2025? Give the result in pounds sterling (GBP), rounded to 2 decimal places.;130522.25 GBP;correct (AI: 130522.25 GBP);"Test run: answer from the test model, no real working.
+
+RESULT: 130522.25 GBP";Without converting millions the result would be 0.13 | The 2024 headcount (9,517) would give 134,979.51;"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] FLAG wrong_source: Test run: random test verdict, not a real finding.
+[plausibility] FLAG missing_information: Test run: random test verdict, not a real finding.";;;example;x
+12;FC-011;By how much did Meridian Grid Energy's net financial debt change between the end of 2024 and 30 September 2025? Give the exact result in euros (EUR), as a positive number for an increase and a negative number for a decrease.;887000000 EUR;correct (AI: 887000000 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 887000000 EUR";Units not aligned (13,975 - 14.862): about -13,960 million | The 15.5 bn forecast instead of the actual figure: 1,525,000,000;"[calculation] ok : Test run: random test verdict (no error rolled).
+[numbers] FLAG wrong_source: Test run: random test verdict, not a real finding.
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+13;FC-004;Assuming the number of shares in issue at 31 December 2025 applies to both the interim and the proposed final dividend, what is the total dividend amount for the 2025 financial year? Give the exact result in pounds sterling (GBP), without rounding.;32334339.375 GBP;correct (AI: 32334339.375 GBP);"Test run: answer from the test model, no real working.
+
+RESULT: 32334339.375 GBP";The 2024 share count (291,032,800) would give 32,741,190 | Without converting pence the result is 100 times too large | Only the final dividend of 7.85p would give 22,562,183.475 | The 2024 dividends (3.15 + 7.60) would give 30,897,257.625;"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+14;FC-005;By what percentage will the unit price of article A-220 increase from 1 March 2026? Give the result in percent, rounded to 2 decimal places.;5.57 %;correct (AI: 5.57 %);"Test run: answer from the test model, no real working.
+
+RESULT: 5.57 %";The provisional price 5.25 from the November letter would give 8.25%;"[calculation] FLAG calculation_error: Test run: random test verdict, not a real finding.
+[numbers] ok : Test run: random test verdict (no error rolled).
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x
+15;FC-010;How much will Meridian Grid Energy's grid investment programme for 2025 to 2029 amount to per customer, based on the latest customer count in the report? Give the result in euros (EUR), rounded to 2 decimal places.;500.64 EUR;correct (AI: 500.64 EUR);"Test run: answer from the test model, no real working.
+
+RESULT: 500.64 EUR";Rounded customer count from the CEO quote (12.5 million): 500.00 | Customer count at 31 Dec 2024 (12,107,455): 516.21 | Only the 9M programme spending of 1,102 million: 88.27;"[calculation] ok : Test run: random test verdict (no error rolled).
+[numbers] FLAG wrong_source: Test run: random test verdict, not a real finding.
+[plausibility] ok : Test run: random test verdict (no error rolled).";;;example;x

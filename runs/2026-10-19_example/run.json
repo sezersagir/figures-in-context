@@ -1,0 +1,57 @@
+{
+  "test_cases": "test_cases/batch-*.json",
+  "repetitions": 1,
+  "models_under_test": [
+    {
+      "provider": "test",
+      "model": "random"
+    },
+    {
+      "provider": "test",
+      "model": "correct"
+    }
+  ],
+  "judges": {
+    "numbers": {
+      "provider": "test",
+      "model": "judge-numbers"
+    },
+    "calculation": {
+      "provider": "test",
+      "model": "judge-calculation"
+    },
+    "plausibility": {
+      "provider": "test",
+      "model": "judge-plausibility"
+    }
+  },
+  "sample": {
+    "share": 0.2,
+    "minimum": 3,
+    "seed": 42
+  },
+  "parallel": 4,
+  "test": true,
+  "record": {
+    "prompt_hashes": {
+      "model_under_test": "123c5e3e2dbd",
+      "judge_numbers": "a27b7171a2d0",
+      "judge_calculation": "dfbe079928d4",
+      "judge_plausibility": "59e45f726c96"
+    },
+    "test_cases": [
+      "FC-001",
+      "FC-002",
+      "FC-003",
+      "FC-004",
+      "FC-005",
+      "FC-006",
+      "FC-007",
+      "FC-008",
+      "FC-009",
+      "FC-010",
+      "FC-011"
+    ],
+    "test_cases_hash": "af6fb4cb73e4"
+  }
+}
