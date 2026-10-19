@@ -172,7 +172,10 @@ def _test(ziel, schema, kontext):
         urteil = {
             "flag": bool(typen),
             "fehlertypen": typen,
-            "befund": "Testurteil." if typen else "No problems found (test model).",
+            # Testmodell würfelt: etwa jede vierte Antwort bekommt einen zufälligen Fehlertyp, damit
+            # Weiterleitung und Review im Probelauf etwas zu tun haben. Kein echter Befund.
+            "befund": "Probelauf: zufälliges Testurteil, kein echter Befund." if typen
+                      else "Probelauf: zufälliges Testurteil (kein Fehler gewürfelt).",
             "belege": [],
             "sicherheit": "mittel",
         }
@@ -188,4 +191,4 @@ def _test(ziel, schema, kontext):
         zeile = f"RESULT: {loesung['wert']} million {loesung['einheit']}"
     else:
         zeile = "The result could not be determined."
-    return {"text": "Working (test model).\n\n" + zeile, "tokens_rein": 0, "tokens_raus": 0, "abbruchgrund": "test", "versuche": 1}
+    return {"text": "Probelauf: Antwort des Testmodells, kein echter Rechenweg.\n\n" + zeile, "tokens_rein": 0, "tokens_raus": 0, "abbruchgrund": "test", "versuche": 1}

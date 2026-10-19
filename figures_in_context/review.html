@@ -78,6 +78,8 @@ summary{cursor:pointer;color:var(--schiefer);font-size:.9rem}
 .status{font-size:.8rem;color:var(--gruen);text-align:center;min-height:1.1em}
 
 .fertig{max-width:36rem;margin:4rem auto;text-align:center}
+body.probe .rahmen{height:calc(100% - 46px - 1.95rem)}
+.probe-band{background:var(--bernstein);color:#2A1D05;font-size:.85rem;font-weight:600;padding:.35rem 1.25rem}
 .fertig a.weiter{display:inline-block;text-decoration:none}
 .zurueck{color:#C9D1DA;text-decoration:none;font-size:.85rem;white-space:nowrap}
 .zurueck:hover{color:#fff}
@@ -88,7 +90,7 @@ summary{cursor:pointer;color:var(--schiefer);font-size:.9rem}
   .fortschritt{order:3;flex-basis:100%}
   .kopf label{margin-left:auto}
   .kopf input{width:7rem}
-  .rahmen{grid-template-columns:1fr;height:auto}
+  .rahmen,body.probe .rahmen{grid-template-columns:1fr;height:auto}
   .liste{display:none}
   .spalten{grid-template-columns:1fr}
   .leiste{left:0;padding:.75rem 1rem;grid-template-columns:1fr}
@@ -106,6 +108,7 @@ summary{cursor:pointer;color:var(--schiefer);font-size:.9rem}
   <div class="fortschritt"><div class="balken"><i id="balken"></i></div><span id="zaehler"></span></div>
   <label>Reviewer <input id="reviewer" autocomplete="name"></label>
 </header>
+<div class="probe-band" id="probe-band" hidden>Probelauf mit Testmodellen: Antworten und Judge-Urteile sind zufällig erzeugt, um den Ablauf zu üben. Die gemeldeten Fehler sind keine echten Befunde.</div>
 <div class="rahmen">
   <nav class="liste" id="liste" aria-label="Fälle"></nav>
   <main id="haupt"></main>
@@ -273,6 +276,7 @@ let LAUF = "<lauf>";
 fetch("api/faelle").then(r => r.json()).then(d => {
   if (!d.faelle) throw new Error(d.fehler);
   LAUF = d.lauf;
+  if (d.test) { $("probe-band").hidden = false; document.body.classList.add("probe"); }
   if (IN_APP) { $("zurueck").hidden = false; $("zurueck").href = "../../#" + encodeURIComponent(LAUF); }
   FAELLE = d.faelle; TYPEN = d.fehlertypen;
   document.title = "Figures in Context Review – " + d.lauf;

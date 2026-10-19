@@ -68,7 +68,8 @@ class ReviewSitzung:
         self.sperre = threading.Lock()
 
     def daten(self):
-        return {"lauf": self.laufordner.name, "fehlertypen": daten.FEHLERTYPEN, "faelle": self.faelle}
+        test = daten.lade_json(self.laufordner / "lauf.json").get("test", False)
+        return {"lauf": self.laufordner.name, "test": test, "fehlertypen": daten.FEHLERTYPEN, "faelle": self.faelle}
 
     def speichern(self, eingabe):
         fall = self.nach_nr.get(str(eingabe.get("fall_nr")))
