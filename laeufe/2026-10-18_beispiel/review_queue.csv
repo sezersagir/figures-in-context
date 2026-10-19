@@ -1,0 +1,91 @@
+﻿fall_nr;testfall_id;frage;musterloesung;python_ergebnis;antwort_text;fallen;judge_befunde;fehlertypen_final;kommentar;reviewer;geprueft
+1;ZE-009;How much interest does Meridian Grid Energy pay to the holders of its green bond on each coupon date? Give the exact result in euros (EUR), without rounding.;53281250 EUR;richtig (KI: 53281250 EUR);"Working (test model).
+
+RESULT: 53281250 EUR";Jahreszins statt Halbjahresrate: 106,562,500 | Hybridanleihe (1.25 bn, 4.125%) verwechselt: 51,562,500 bzw. 25,781,250;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] FLAG falsch_gerechnet: Testurteil.
+[zahlen] FLAG erfundene_zahl: Testurteil.";;;;
+2;ZE-008;What was Meridian Grid Energy's market capitalisation at the end of September 2025? Give the exact result in euros (EUR), without rounding.;26961464480.2 EUR;richtig (KI: 26961464480.2 EUR);"Working (test model).
+
+RESULT: 26961464480.2 EUR";Kurs vom 30 June 2025 (21.96): 25,216,088,585.40;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] FLAG falsche_quelle: Testurteil.";;;;
+3;ZE-007;How much did Meridian Grid Energy earn from selling electricity in the first nine months of 2025, based on the volume delivered and the average price it realised? Give the exact result in euros (EUR), without rounding.;3616565400 EUR;richtig (KI: 3616565400 EUR);"Working (test model).
+
+RESULT: 3616565400 EUR";Gesamtumsatz 5,912 million statt Berechnung | Faktor 1,000 statt 1,000,000 (TWh -> GWh verwechselt): 3,616,565.4 | Wert aus CEO-Zitat (41 TWh): 3,584,220,000 | Vorjahreswerte (39.82 TWh, 94.10): 3,747,062,000;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] FLAG falsch_gerechnet: Testurteil.
+[zahlen] ok : No problems found (test model).";;;;
+4;ZE-004;Assuming the number of shares in issue at 31 December 2025 applies to both the interim and the proposed final dividend, what is the total dividend amount for the 2025 financial year? Give the exact result in pounds sterling (GBP), without rounding.;32334339.375 GBP;richtig (KI: 32334339.375 GBP);"Working (test model).
+
+RESULT: 32334339.375 GBP";Aktienzahl 2024 (291,032,800) ergaebe 32,741,190 | Ohne pence-Umrechnung 100-fach zu gross | Nur Schlussdividende 7.85p ergaebe 22,562,183.475 | Dividenden 2024 (3.15 + 7.60) ergaebe 30,897,257.625;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] FLAG falsche_quelle: Testurteil.";;;;
+5;ZE-008;What was Meridian Grid Energy's market capitalisation at the end of September 2025? Give the exact result in euros (EUR), without rounding.;26961464480.2 EUR;richtig (KI: 26961464480.2 EUR);"Working (test model).
+
+RESULT: 26961464480.2 EUR";Kurs vom 30 June 2025 (21.96): 25,216,088,585.40;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] FLAG falsch_gerechnet: Testurteil.
+[zahlen] FLAG falsche_quelle: Testurteil.";;;;
+6;ZE-011;By how much did Meridian Grid Energy's net financial debt change between the end of 2024 and 30 September 2025? Give the exact result in euros (EUR), as a positive number for an increase and a negative number for a decrease.;887000000 EUR;richtig (KI: 887000000 EUR);"Working (test model).
+
+RESULT: 887000000 EUR";Einheiten nicht angeglichen (13,975 - 14.862): ca. -13,960 million | Prognose 15.5 bn statt Ist-Wert: 1,525,000,000;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] FLAG falsche_quelle: Testurteil.";;;;
+7;ZE-001;By what percentage did Halvorsen Freight Group's revenue grow in 2025 compared with 2024? Give the result in percent, rounded to 2 decimal places.;7.29 %;richtig (KI: 7.29 %);"Working (test model).
+
+RESULT: 7.29 %";Originalwert 1,211.8 aus Note 4 ergaebe 6.01%;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] ok : No problems found (test model).";;;;
+8;ZE-009;How much interest does Meridian Grid Energy pay to the holders of its green bond on each coupon date? Give the exact result in euros (EUR), without rounding.;53281250 EUR;FALSCH (KI: 532812501 EUR);"Working (test model).
+
+RESULT: 532812501 EUR";Jahreszins statt Halbjahresrate: 106,562,500 | Hybridanleihe (1.25 bn, 4.125%) verwechselt: 51,562,500 bzw. 25,781,250;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] ok : No problems found (test model).";falsches_ergebnis;;;
+9;ZE-005;By what percentage will the unit price of article A-220 increase from 1 March 2026? Give the result in percent, rounded to 2 decimal places.;5.57 %;richtig (KI: 5.57 %);"Working (test model).
+
+RESULT: 5.57 %";Vorlaeufiger Preis 5.25 aus dem Novemberbrief ergaebe 8.25%;"[plausibilitaet] FLAG ausgelassene_information: Testurteil.
+[rechenweg] ok : No problems found (test model).
+[zahlen] ok : No problems found (test model).";;;;
+10;ZE-003;What share of Halvorsen Freight Group's total 2025 revenue came from the Ocean Forwarding segment? Give the result in percent, rounded to 2 decimal places.;34.17 %;richtig (KI: 34.17 %);"Working (test model).
+
+RESULT: 34.17 %";Ohne Angleichen: 438,915 / 1,284.6 ergibt einen absurden Wert (ca. 34,167%);"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] ok : No problems found (test model).";;;;
+11;ZE-002;What was Halvorsen Freight Group's revenue per average employee in 2025? Give the result in pounds sterling (GBP), rounded to 2 decimal places.;130522.25 GBP;richtig (KI: 130522.251 GBP);"Working (test model).
+
+RESULT: 130522.251 GBP";Ohne Umrechnung von Millionen kaeme 0.13 heraus | Mitarbeiterzahl 2024 (9,517) ergaebe 134,979.51;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] FLAG falsch_gerechnet: Testurteil.
+[zahlen] ok : No problems found (test model).";;;;
+12;ZE-006;Using the 2025 quantities given as the planning basis and the new prices, what would Brightwater Packaging Ltd's annual net invoice value be after the volume rebate? Give the exact result in euros (EUR), without rounding.;1345925.4 EUR;richtig (KI: 1345925.4 EUR);"Working (test model).
+
+RESULT: 1345925.4 EUR";Rabatt auf den ganzen Betrag: 1,338,425.40 | B-310 als 1,240 Stueck statt Packs gerechnet | USD-Umrechnung mit 1.0835 (gilt nur fuer die US-Tochter);"[plausibilitaet] FLAG ausgelassene_information: Testurteil.
+[rechenweg] ok : No problems found (test model).
+[zahlen] FLAG erfundene_zahl: Testurteil.";;;;
+13;ZE-004;Assuming the number of shares in issue at 31 December 2025 applies to both the interim and the proposed final dividend, what is the total dividend amount for the 2025 financial year? Give the exact result in pounds sterling (GBP), without rounding.;32334339.375 GBP;richtig (KI: 32334339.375 GBP);"Working (test model).
+
+RESULT: 32334339.375 GBP";Aktienzahl 2024 (291,032,800) ergaebe 32,741,190 | Ohne pence-Umrechnung 100-fach zu gross | Nur Schlussdividende 7.85p ergaebe 22,562,183.475 | Dividenden 2024 (3.15 + 7.60) ergaebe 30,897,257.625;"[plausibilitaet] FLAG ausgelassene_information: Testurteil.
+[rechenweg] ok : No problems found (test model).
+[zahlen] ok : No problems found (test model).";;;;
+14;ZE-010;How much will Meridian Grid Energy's grid investment programme for 2025 to 2029 amount to per customer, based on the latest customer count in the report? Give the result in euros (EUR), rounded to 2 decimal places.;500.64 EUR;richtig (KI: 500.64 EUR);"Working (test model).
+
+RESULT: 500.64 EUR";Gerundete Kundenzahl aus CEO-Zitat (12.5 million): 500.00 | Kundenzahl 31 Dec 2024 (12,107,455): 516.21 | Nur 9M-Programmausgaben 1,102 million: 88.27;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] FLAG falsch_gerechnet: Testurteil.
+[zahlen] ok : No problems found (test model).";;;;
+15;ZE-007;How much did Meridian Grid Energy earn from selling electricity in the first nine months of 2025, based on the volume delivered and the average price it realised? Give the exact result in euros (EUR), without rounding.;3616565400 EUR;richtig (KI: 3616565400 EUR);"Working (test model).
+
+RESULT: 3616565400 EUR";Gesamtumsatz 5,912 million statt Berechnung | Faktor 1,000 statt 1,000,000 (TWh -> GWh verwechselt): 3,616,565.4 | Wert aus CEO-Zitat (41 TWh): 3,584,220,000 | Vorjahreswerte (39.82 TWh, 94.10): 3,747,062,000;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] ok : No problems found (test model).";;;;
+16;ZE-002;What was Halvorsen Freight Group's revenue per average employee in 2025? Give the result in pounds sterling (GBP), rounded to 2 decimal places.;130522.25 GBP;richtig (KI: 130522.25 GBP);"Working (test model).
+
+RESULT: 130522.25 GBP";Ohne Umrechnung von Millionen kaeme 0.13 heraus | Mitarbeiterzahl 2024 (9,517) ergaebe 134,979.51;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] FLAG falsch_gerechnet: Testurteil.
+[zahlen] FLAG falsche_quelle: Testurteil.";;;;
+17;ZE-001;By what percentage did Halvorsen Freight Group's revenue grow in 2025 compared with 2024? Give the result in percent, rounded to 2 decimal places.;7.29 %;richtig (KI: 7.291 %);"Working (test model).
+
+RESULT: 7.291 %";Originalwert 1,211.8 aus Note 4 ergaebe 6.01%;"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] FLAG falsche_quelle: Testurteil.";;;;
+18;ZE-006;Using the 2025 quantities given as the planning basis and the new prices, what would Brightwater Packaging Ltd's annual net invoice value be after the volume rebate? Give the exact result in euros (EUR), without rounding.;1345925.4 EUR;FALSCH (KI: 1345925.41 EUR);"Working (test model).
+
+RESULT: 1345925.41 EUR";Rabatt auf den ganzen Betrag: 1,338,425.40 | B-310 als 1,240 Stueck statt Packs gerechnet | USD-Umrechnung mit 1.0835 (gilt nur fuer die US-Tochter);"[plausibilitaet] ok : No problems found (test model).
+[rechenweg] ok : No problems found (test model).
+[zahlen] ok : No problems found (test model).";falsches_ergebnis;;;

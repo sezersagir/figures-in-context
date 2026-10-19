@@ -1,0 +1,56 @@
+{
+  "testfaelle": "testfaelle/charge-*.json",
+  "wiederholungen": 1,
+  "testobjekte": [
+    {
+      "anbieter": "test",
+      "modell": "zufall"
+    },
+    {
+      "anbieter": "test",
+      "modell": "richtig"
+    }
+  ],
+  "judges": {
+    "zahlen": {
+      "anbieter": "test",
+      "modell": "judge-zahlen"
+    },
+    "rechenweg": {
+      "anbieter": "test",
+      "modell": "judge-rechenweg"
+    },
+    "plausibilitaet": {
+      "anbieter": "test",
+      "modell": "judge-plausibilitaet"
+    }
+  },
+  "stichprobe": {
+    "anteil": 0.2,
+    "minimum": 3,
+    "seed": 42
+  },
+  "parallel": 4,
+  "protokoll": {
+    "prompt_hashes": {
+      "testobjekt": "123c5e3e2dbd",
+      "judge_zahlen": "ae9b745d8e84",
+      "judge_rechenweg": "6e62ee2a136e",
+      "judge_plausibilitaet": "c11838e3f2d2"
+    },
+    "testfaelle": [
+      "ZE-001",
+      "ZE-002",
+      "ZE-003",
+      "ZE-004",
+      "ZE-005",
+      "ZE-006",
+      "ZE-007",
+      "ZE-008",
+      "ZE-009",
+      "ZE-010",
+      "ZE-011"
+    ],
+    "testfaelle_hash": "d7d16194cdd5"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "testfaelle": "testfaelle/charge-*.json",
+  "wiederholungen": 1,
+  "testobjekte": [
+    {"anbieter": "anthropic", "modell": "claude-opus-5-5"},
+    {"anbieter": "openai", "modell": "gpt-5"},
+    {"anbieter": "google", "modell": "gemini-2.5-pro"}
+  ],
+  "judges": {
+    "zahlen": {"anbieter": "openai", "modell": "gpt-5"},
+    "rechenweg": {"anbieter": "anthropic", "modell": "claude-opus-5-5", "effort": "high"},
+    "plausibilitaet": {"anbieter": "google", "modell": "gemini-2.5-pro"}
+  },
+  "stichprobe": {"anteil": 0.2, "minimum": 30, "seed": 42},
+  "parallel": 4
+}

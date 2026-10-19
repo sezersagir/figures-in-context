@@ -1,0 +1,6 @@
+{
+  "EUR": ["EUR", "€", "euro", "euros"],
+  "GBP": ["GBP", "£", "pound", "pounds", "pounds sterling", "sterling"],
+  "USD": ["USD", "$", "US$", "dollar", "dollars"],
+  "%": ["%", "percent", "per cent", "pct"]
+}

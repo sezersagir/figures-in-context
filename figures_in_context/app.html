@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figures in Context</title>
+<style>
+:root{
+  --tinte:#1B2430; --tinte-2:#2A3544; --tinte-3:#3A4656; --nebel:#C9D1DA;
+  --schiefer:#5B6672; --linie:#D5DBE1; --grund:#EEF1F4; --blatt:#FFFFFF;
+  --streifen:#FBFAF5; --streifen-linie:#E6E2D6;
+  --gruen:#2E6B4F; --gruen-hell:#E3F0E8; --rot:#B3261E; --rot-hell:#F8E3E1; --bernstein:#C98A1B; --bernstein-hell:#FBF0DC;
+  --mono:"Cascadia Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--grund);color:var(--tinte);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--bernstein);outline-offset:2px}
+a{color:inherit}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- Gerüst: Leiste links, Inhalt rechts ---------- */
+.app{display:grid;grid-template-columns:16rem 1fr;min-height:100vh}
+.leiste{background:var(--tinte);color:var(--nebel);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:auto}
+.marke-kopf{padding:1.1rem 1.25rem .9rem;border-bottom:1px solid var(--tinte-2)}
+.marke-kopf b{display:block;color:#fff;font-size:1.05rem;letter-spacing:.01em}
+.marke-kopf span{font-size:.78rem}
+.leiste nav{display:flex;flex-direction:column;padding:.6rem .6rem 0}
+.leiste nav a{text-decoration:none;padding:.45rem .65rem;border-radius:5px;font-size:.92rem}
+.leiste nav a:hover{background:var(--tinte-2);color:#fff}
+.leiste nav a[aria-current="page"]{background:var(--tinte-2);color:#fff;box-shadow:inset 3px 0 0 #7FC29B}
+.leiste h2{font-size:.78rem;font-weight:600;color:#8D99A6;margin:1.25rem 1.25rem .4rem}
+.laufliste{display:flex;flex-direction:column;padding:0 .6rem}
+.laufliste a{text-decoration:none;padding:.4rem .65rem;border-radius:5px;font-size:.88rem;display:block}
+.laufliste a:hover{background:var(--tinte-2);color:#fff}
+.laufliste a[aria-current="true"]{background:var(--tinte-2);color:#fff}
+.laufliste small{display:block;font-size:.75rem;color:#8D99A6}
+.punkt{display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:#7FC29B;margin-left:.35rem;vertical-align:1px;animation:puls 1.4s ease-in-out infinite}
+@keyframes puls{50%{opacity:.25}}
+.neu{margin:.5rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.45rem}
+.neu input[type=text]{background:var(--tinte-2);border:1px solid var(--tinte-3);color:#fff;border-radius:5px;padding:.4rem .6rem}
+.neu input::placeholder{color:#8D99A6}
+.neu label{font-size:.82rem;display:flex;gap:.45rem;align-items:center}
+.neu button{background:#7FC29B;color:var(--tinte);border:0;border-radius:5px;padding:.45rem;font-weight:600;cursor:pointer}
+.neu button:hover{background:#9AD3B1}
+.neu .meldung{font-size:.8rem;color:#F2B8B5}
+.leiste .fuss{margin-top:auto;padding:1rem 1.25rem;font-size:.78rem;border-top:1px solid var(--tinte-2)}
+.leiste .fuss.problem{color:#F2B8B5}
+
+.inhalt{min-width:0;padding:1.75rem 2rem 4rem}
+.zwei{display:grid;grid-template-columns:minmax(0,1fr) 25rem;gap:1.75rem;align-items:start}
+
+/* ---------- Kopf eines Laufs ---------- */
+.titel{display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap;margin-bottom:.15rem}
+.titel h1{font-size:1.6rem;line-height:1.2;margin:0;font-weight:650}
+.leise{color:var(--schiefer);font-size:.88rem}
+.etikett{font-size:.75rem;font-weight:600;border-radius:3px;padding:.05rem .4rem}
+.etikett.test{background:var(--bernstein-hell);color:#8A5D0E}
+.etikett.ok{background:var(--gruen-hell);color:var(--gruen)}
+.etikett.nein{background:var(--rot-hell);color:var(--rot)}
+
+/* Fortschritt als Kette von fünf Stufen */
+.kette{display:grid;grid-template-columns:repeat(5,1fr);margin:1.5rem 0 1.25rem;border:1px solid var(--linie);border-radius:6px;background:var(--blatt);overflow:hidden}
+.glied{padding:.75rem .9rem .8rem;border-right:1px solid var(--linie);position:relative}
+.glied:last-child{border-right:0}
+.glied .name{font-size:.82rem;color:var(--schiefer);display:flex;align-items:center;gap:.4rem}
+.glied .wert{font-size:1.15rem;font-weight:600;margin-top:.1rem}
+.glied .soll{font-size:.85rem;color:var(--schiefer);font-weight:400}
+.glied .spur{position:absolute;left:0;bottom:0;height:3px;background:var(--gruen);transition:width .4s}
+.glied.fertig .name::before{content:"";width:.55rem;height:.55rem;border-radius:50%;background:var(--gruen)}
+.glied.teil .name::before{content:"";width:.55rem;height:.55rem;border-radius:50%;border:2px solid var(--bernstein)}
+.glied.offen .name::before{content:"";width:.55rem;height:.55rem;border-radius:50%;border:2px solid var(--linie)}
+.glied.teil .spur{background:var(--bernstein)}
+
+.zahlen{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.zahl{background:var(--blatt);border:1px solid var(--linie);border-radius:6px;padding:.7rem .9rem}
+.zahl b{display:block;font-size:1.7rem;line-height:1.15;font-weight:650}
+.zahl span{font-size:.82rem;color:var(--schiefer)}
+.zahl.gut b{color:var(--gruen)} .zahl.schlecht b{color:var(--rot)}
+
+.knoepfe{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem}
+.knopf{background:var(--tinte);color:#fff;border:1px solid var(--tinte);border-radius:5px;padding:.5rem 1rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;white-space:nowrap}
+.knopf:hover{background:var(--tinte-2)}
+.knopf.zweit{background:var(--blatt);color:var(--tinte);border-color:var(--linie)}
+.knopf.zweit:hover{background:var(--grund)}
+.knopf:disabled{opacity:.45;cursor:default}
+
+.hinweis{border-left:4px solid var(--bernstein);background:var(--bernstein-hell);padding:.6rem .9rem;border-radius:4px;font-size:.9rem;margin-top:1rem}
+.hinweis.fehler{border-color:var(--rot);background:var(--rot-hell)}
+.hinweis.ok{border-color:var(--gruen);background:var(--gruen-hell)}
+.dateien{margin-top:1.5rem;font-size:.88rem;color:var(--schiefer)}
+.dateien a{margin-right:.75rem}
+
+/* ---------- Der Rechenstreifen: das Protokoll ---------- */
+.streifen{position:sticky;top:1.25rem;background:var(--streifen);border:1px solid var(--streifen-linie);border-radius:3px;
+  box-shadow:0 1px 0 var(--streifen-linie),0 10px 24px -18px rgba(27,36,48,.5);display:flex;flex-direction:column;max-height:calc(100vh - 2.5rem)}
+.streifen::before,.streifen::after{content:"";position:absolute;left:0;right:0;height:6px;
+  background:radial-gradient(circle at 5px 3px,var(--grund) 2.5px,transparent 3px) 0 0/10px 6px repeat-x}
+.streifen::before{top:-4px} .streifen::after{bottom:-4px}
+.streifen-kopf{padding:.9rem 1rem .6rem;border-bottom:1px dashed var(--streifen-linie)}
+.streifen-kopf h2{font-size:.95rem;margin:0 0 .5rem;display:flex;justify-content:space-between;align-items:baseline}
+.streifen-kopf h2 small{font-weight:400;color:var(--schiefer);font-size:.78rem}
+.summe{display:grid;grid-template-columns:repeat(4,1fr);gap:.25rem .5rem;font-family:var(--mono);font-size:.78rem}
+.summe div{display:flex;flex-direction:column}
+.summe b{font-size:.92rem}
+.summe span{color:var(--schiefer);font-family:system-ui,sans-serif;font-size:.72rem}
+.filter{display:flex;gap:.3rem;margin-top:.7rem;flex-wrap:wrap}
+.filter button{border:1px solid var(--streifen-linie);background:transparent;border-radius:999px;padding:.1rem .6rem;font-size:.78rem;cursor:pointer}
+.filter button[aria-pressed="true"]{background:var(--tinte);color:#fff;border-color:var(--tinte)}
+.zeilen{overflow:auto;font-family:var(--mono);font-size:.76rem;line-height:1.45;padding:.4rem 0 .8rem;min-height:8rem}
+.zeile{display:grid;grid-template-columns:4.1rem minmax(6rem,1fr) auto 3.6rem;gap:.5rem;padding:.25rem 1rem;cursor:default;border-left:3px solid transparent}
+.zeile.klickbar{cursor:pointer}
+.zeile.klickbar:hover{background:#F2F0E8}
+.zeile .zeit{color:#9AA3AD}
+.zeile .was{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zeile .rechts{text-align:right;color:var(--schiefer);white-space:nowrap}
+.zeile .erg{text-align:right;white-space:nowrap;max-width:9.5rem;overflow:hidden;text-overflow:ellipsis}
+.zeile.info .was,.zeile.warnung .was,.zeile.fehler .was{grid-column:2/-1;}
+.zeile.info .was,.zeile.warnung .was{white-space:normal;font-family:system-ui,sans-serif;font-size:.8rem;color:var(--schiefer)}
+.zeile.warnung{border-left-color:var(--bernstein)} .zeile.warnung .was{color:#8A5D0E}
+.zeile.fehler{border-left-color:var(--rot);background:#FCEFEE} .zeile.fehler .was{color:var(--rot);white-space:normal}
+.zeile .ok{color:var(--gruen)} .zeile .flag{color:var(--rot);font-weight:600}
+.zeile .detail{grid-column:2/-1;white-space:pre-wrap;font-family:system-ui,sans-serif;font-size:.8rem;color:var(--tinte);background:var(--blatt);border:1px solid var(--streifen-linie);border-radius:3px;padding:.45rem .6rem;margin:.25rem 0 .2rem}
+.leer-streifen{padding:1.5rem 1rem;color:var(--schiefer);font-family:system-ui,sans-serif;font-size:.85rem}
+.live{font-size:.75rem;color:var(--gruen);font-weight:600}
+
+/* ---------- Kalibrierung und Einstellungen ---------- */
+.karte{background:var(--blatt);border:1px solid var(--linie);border-radius:6px;padding:1.1rem 1.25rem}
+.karte + .karte{margin-top:1rem}
+.karte h2{font-size:1.1rem;margin:0 0 .35rem}
+.karte h3{font-size:.9rem;color:var(--schiefer);margin:1rem 0 .5rem;font-weight:600}
+.tabelle{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:.5rem}
+.tabelle th{text-align:left;font-weight:600;color:var(--schiefer);font-size:.82rem;border-bottom:1px solid var(--linie);padding:.35rem .5rem}
+.tabelle td{border-bottom:1px solid var(--grund);padding:.45rem .5rem;vertical-align:top}
+.raster{display:grid;grid-template-columns:11rem 1fr;gap:.6rem 1rem;align-items:center}
+input[type=text],input[type=password],input[type=number],select{border:1px solid var(--linie);border-radius:4px;padding:.38rem .55rem;background:var(--blatt);min-width:0}
+.modellzeile{display:grid;grid-template-columns:8.5rem minmax(0,1fr) 7rem 2rem;gap:.5rem;margin-bottom:.45rem;align-items:center}
+.modellzeile .weg{border:0;background:none;cursor:pointer;color:var(--schiefer);font-size:1.1rem}
+.status-schluessel{font-size:.8rem}
+.status-schluessel.ja{color:var(--gruen)} .status-schluessel.nein{color:var(--rot)}
+.meldung{font-size:.88rem;align-self:center}
+.leer{text-align:center;padding:4rem 1rem;color:var(--schiefer)}
+.leer h1{color:var(--tinte);font-size:1.4rem;margin:0 0 .5rem}
+.protokoll-alt{background:var(--tinte);color:#D8DEE5;font-family:var(--mono);font-size:.78rem;border-radius:5px;padding:.75rem 1rem;max-height:14rem;overflow:auto;white-space:pre-wrap;margin-top:1rem}
+
+@media (max-width:1100px){ .zwei{grid-template-columns:1fr} .streifen{position:static;max-height:32rem} }
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}
+  .leiste{position:static;height:auto}
+  .leiste nav{flex-direction:row;flex-wrap:wrap}
+  .laufliste{flex-direction:row;overflow-x:auto;padding-bottom:.5rem}
+  .laufliste a{white-space:nowrap}
+  .leiste .fuss{display:none}
+  .inhalt{padding:1.25rem 1rem 3rem}
+  .kette{grid-template-columns:repeat(3,1fr)} .glied{border-bottom:1px solid var(--linie)}
+  .zahlen{grid-template-columns:1fr 1fr 1fr} .zahl b{font-size:1.3rem}
+  .raster{grid-template-columns:1fr}
+  .modellzeile{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="leiste">
+    <div class="marke-kopf"><b>Figures in Context</b><span>Versteht die KI das Dokument trotz der Zahlen?</span></div>
+    <nav>
+      <a href="#" id="nav-laeufe">Läufe</a>
+      <a href="#kalibrierung" id="nav-kal">Kalibrierung</a>
+      <a href="#einstellungen" id="nav-einst">Einstellungen</a>
+    </nav>
+    <h2>Läufe</h2>
+    <div class="laufliste" id="laufliste"></div>
+    <form class="neu" id="neu">
+      <input type="text" id="neu-name" placeholder="Neuer Lauf, z. B. pilot" required aria-label="Name des neuen Laufs">
+      <label><input type="checkbox" id="neu-test"> Probelauf mit Testmodellen (kostenlos)</label>
+      <button>Lauf anlegen</button>
+      <div class="meldung" id="neu-meldung" role="status"></div>
+    </form>
+    <div class="fuss" id="info"></div>
+  </aside>
+  <main class="inhalt" id="seite"></main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ANBIETER = ["anthropic", "openai", "google", "test"];
+const JUDGES = {zahlen: "Zahlen-Judge", rechenweg: "Rechenweg-Judge", plausibilitaet: "Plausibilitäts-Judge"};
+const zahl = n => (n ?? 0).toLocaleString("de-DE");
+let STATUS = null, takt = null;
+
+async function api(pfad, inhalt){
+  const opt = inhalt === undefined ? {} : {method: "POST", body: JSON.stringify(inhalt),
+    headers: {"Content-Type": "application/json", "X-Figures-In-Context": "1"}};
+  let r;
+  try { r = await fetch(pfad, opt) } catch { throw new Error("Keine Verbindung. Läuft das Fenster mit Figures in Context noch?") }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.fehler || `Fehler ${r.status}`);
+  return d;
+}
+
+async function lade(vonTakt){
+  try { STATUS = await api("api/status") }
+  catch (e) { $("seite").innerHTML = `<div class="hinweis fehler">${esc(e.message)}</div>`; return }
+  const p = STATUS.testfall_probleme.length;
+  $("info").textContent = `${STATUS.testfaelle} Testfälle geladen` + (p ? `, ${p} mit Problemen` : "");
+  $("info").classList.toggle("problem", !!p);
+  // Einstellungen nicht neu zeichnen, während dort jemand tippt
+  if (!(vonTakt && location.hash === "#einstellungen")) zeige();
+  clearTimeout(takt);
+  if (STATUS.job && STATUS.job.laeuft) takt = setTimeout(() => lade(true), 1500);
+}
+
+function bereich(){
+  const ziel = decodeURIComponent(location.hash.slice(1));
+  return {ziel, bereich: ["einstellungen", "kalibrierung"].includes(ziel) ? ziel : "laeufe"};
+}
+
+function zeige(){
+  const {ziel, bereich: b} = bereich();
+  $("nav-laeufe").setAttribute("aria-current", b === "laeufe" ? "page" : "false");
+  $("nav-kal").setAttribute("aria-current", b === "kalibrierung" ? "page" : "false");
+  $("nav-einst").setAttribute("aria-current", b === "einstellungen" ? "page" : "false");
+  const aktiv = b === "laeufe" ? (ziel && STATUS.laeufe.some(l => l.name === ziel) ? ziel : (STATUS.laeufe[0] || {}).name) : null;
+  zeigeLaufliste(aktiv);
+  if (b === "einstellungen") return zeigeEinstellungen();
+  if (b === "kalibrierung") return zeigeKalibrierung();
+  zeigeLauf(aktiv);
+}
+
+function laeuftGerade(name){ return STATUS.job && STATUS.job.laeuft && STATUS.job.name === name }
+
+function zeigeLaufliste(aktiv){
+  $("laufliste").innerHTML = STATUS.laeufe.map(l => `<a href="#${encodeURIComponent(l.name)}" aria-current="${l.name === aktiv}">
+    ${esc(l.name)}${laeuftGerade(l.name) ? '<span class="punkt" title="läuft"></span>' : ""}<small>${l.fehler ? "nicht lesbar" : (l.test ? "Probe, " : "") + kurzstand(l)}</small></a>`).join("")
+    || '<span class="leise" style="padding:0 .65rem;color:#8D99A6">Noch keine Läufe</span>';
+}
+
+function kurzstand(l){
+  if (l.report) return "Report erstellt";
+  if (l.review_gesamt) return `Review ${l.review_geprueft} von ${l.review_gesamt}`;
+  if (l.antworten) return `${l.antworten} von ${l.antworten_soll} Antworten`;
+  return "noch nicht gestartet";
+}
+
+function fehlendeSchluessel(){
+  const noetig = new Set([...STATUS.config.testobjekte, ...Object.values(STATUS.config.judges)]
+    .map(z => z.anbieter).filter(a => a !== "test"));
+  return [...noetig].filter(a => !STATUS.schluessel[a]);
+}
+
+// ---------- Ein Lauf ----------
+function glied(name, ist, soll, text){
+  const anteil = soll ? Math.min(1, ist / soll) : 0;
+  const klasse = soll && ist >= soll ? "fertig" : ist ? "teil" : "offen";
+  return `<div class="glied ${klasse}"><div class="name">${name}</div>
+    <div class="wert">${text ?? (soll ? `${zahl(ist)} <span class="soll">von ${zahl(soll)}</span>` : "–")}</div>
+    <i class="spur" style="width:${anteil * 100}%"></i></div>`;
+}
+
+function zeigeLauf(name){
+  if (!name) {
+    $("seite").innerHTML = `<div class="leer"><h1>Noch kein Lauf</h1>
+      <p>Leg links einen Lauf an. Mit „Probelauf“ läuft alles mit Testmodellen, ohne API-Kosten.</p></div>`;
+    return;
+  }
+  const l = STATUS.laeufe.find(x => x.name === name);
+  if (l.fehler) { $("seite").innerHTML = `<div class="hinweis fehler">${esc(l.fehler)}</div>`; return }
+  const job = STATUS.job && STATUS.job.name === name ? STATUS.job : null;
+  const laeuft = job && job.laeuft;
+  const andererLaeuft = STATUS.job && STATUS.job.laeuft && !job;
+  const fortschritt = laeuft && job.fortschritt.match(/^(\w+): (\d+)\/(\d+)$/);
+  let antworten = l.antworten, urteile = l.urteile;
+  if (fortschritt && fortschritt[1] === "Antworten") antworten = Math.max(antworten, +fortschritt[2]);
+  if (fortschritt && fortschritt[1] === "Judges") urteile = Math.max(urteile, +fortschritt[2]);
+  const gecheckt = l.richtig + l.falsch + l.formatfehler;
+  const vollstaendig = l.antworten >= l.antworten_soll && l.urteile >= l.urteile_soll && l.review_gesamt;
+  const fehlend = l.test ? [] : fehlendeSchluessel();
+
+  let hinweis = "";
+  if (laeuft) hinweis = `<div class="hinweis">Läuft gerade. Rechts im Protokoll siehst du jede Anfrage, sobald sie zurückkommt.</div>`;
+  else if (job && job.ergebnis === "fertig" && l.review_geprueft < l.review_gesamt) hinweis = `<div class="hinweis ok">Fertig. Jetzt die markierten Fälle im Review prüfen.</div>`;
+  else if (job && job.ergebnis === "unvollstaendig") hinweis = `<div class="hinweis fehler">Nicht alle Anfragen haben geklappt, die Fehler stehen rot im Protokoll. „Fortsetzen“ fragt nur das Fehlende neu an.</div>`;
+  else if (job && job.ergebnis === "fehler") hinweis = `<div class="hinweis fehler">Der Lauf ist abgebrochen: ${esc(job.log[job.log.length - 1] || "")}</div>`;
+  if (!laeuft && fehlend.length && !vollstaendig) hinweis += `<div class="hinweis fehler">Es fehlen API-Schlüssel für ${fehlend.join(", ")}. <a href="#einstellungen">In den Einstellungen eintragen</a>.</div>`;
+
+  const startText = laeuft ? "Läuft …" : l.antworten ? "Fortsetzen" : "Lauf starten";
+  $("seite").innerHTML = `<div class="zwei"><section>
+    <div class="titel"><h1>${esc(l.name)}</h1>${l.test ? '<span class="etikett test">Probelauf</span>' : ""}</div>
+    <div class="leise">Getestet: ${l.testobjekte.map(esc).join(", ")}</div>
+    <div class="kette">
+      ${glied("Antworten", antworten, l.antworten_soll)}
+      ${glied("Python-Check", gecheckt, l.antworten_soll)}
+      ${glied("Judges", urteile, l.urteile_soll)}
+      ${glied("Review", l.review_geprueft, l.review_gesamt)}
+      ${glied("Report", l.report ? 1 : 0, 1, l.report ? "erstellt" : "–")}
+    </div>
+    ${gecheckt ? `<div class="zahlen">
+      <div class="zahl gut"><b>${zahl(l.richtig)}</b><span>Ergebnis richtig</span></div>
+      <div class="zahl ${l.falsch ? "schlecht" : ""}"><b>${zahl(l.falsch)}</b><span>Ergebnis falsch</span></div>
+      <div class="zahl"><b>${zahl(l.formatfehler)}</b><span>Formatfehler, nicht gezählt</span></div></div>` : ""}
+    <div class="knoepfe">
+      ${!vollstaendig || laeuft ? `<button class="knopf" id="start" ${laeuft || andererLaeuft || fehlend.length ? "disabled" : ""}>${startText}</button>` : ""}
+      ${l.review_gesamt ? `<a class="knopf${vollstaendig && l.review_geprueft < l.review_gesamt ? "" : " zweit"}" href="review/${encodeURIComponent(l.name)}/">Review öffnen</a>` : ""}
+      ${l.review_gesamt ? `<button class="knopf${l.review_geprueft >= l.review_gesamt && !l.report ? "" : " zweit"}" id="auswerten" ${laeuft ? "disabled" : ""}>${l.report ? "Report neu erstellen" : "Report erstellen"}</button>` : ""}
+      ${l.report ? `<a class="knopf zweit" href="laeufe/${encodeURIComponent(l.name)}/report.html" target="_blank">Report ansehen</a>` : ""}
+    </div>
+    ${andererLaeuft ? `<p class="leise">Gerade läuft ${esc(STATUS.job.name)}. Es läuft immer nur eins gleichzeitig.</p>` : ""}
+    ${l.review_gesamt && l.review_geprueft < l.review_gesamt ? `<p class="leise">Den Report kannst du auch vor dem Ende des Reviews erstellen. Nicht geprüfte Fälle zählen dann als vorläufig.</p>` : ""}
+    ${hinweis}
+    ${l.review_gesamt || l.report ? `<div class="dateien">Dateien:
+      ${["review_queue.csv", "review_ergebnis.csv", "report.md"].map(d => `<a href="laeufe/${encodeURIComponent(l.name)}/${d}">${d}</a>`).join("")}</div>` : ""}
+    </section>
+    ${streifenHtml()}</div>`;
+
+  const start = $("start"), auswerten = $("auswerten");
+  if (start) start.addEventListener("click", async () => {
+    start.disabled = true;
+    try { await api(`api/laeufe/${encodeURIComponent(name)}/start`, {}); await lade() }
+    catch (err) { alert(err.message); start.disabled = false }
+  });
+  if (auswerten) auswerten.addEventListener("click", async () => {
+    auswerten.disabled = true; auswerten.textContent = "Wird erstellt …";
+    try { await api(`api/laeufe/${encodeURIComponent(name)}/auswertung`, {}); await lade() }
+    catch (err) { alert(err.message); auswerten.disabled = false }
+  });
+  verbindeStreifen(`api/laeufe/${encodeURIComponent(name)}/protokoll`, laeuft);
+}
+
+// ---------- Protokoll als Rechenstreifen ----------
+const STREIFEN = {quelle: null, eintraege: [], gesamt: 0, summe: null, filter: "alle", offen: new Set(), amEnde: true, oben: 0};
+
+function streifenHtml(){
+  return `<aside class="streifen" aria-label="Protokoll">
+    <div class="streifen-kopf">
+      <h2>Protokoll <small id="streifen-live"></small></h2>
+      <div class="summe" id="summe"></div>
+      <div class="filter" id="filter">
+        ${[["alle", "Alles"], ["antwort", "Antworten"], ["urteil", "Judges"], ["fehler", "Fehler"]]
+          .map(([k, t]) => `<button type="button" data-f="${k}" aria-pressed="${STREIFEN.filter === k}">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="zeilen" id="zeilen"><div class="leer-streifen">Lädt …</div></div>
+  </aside>`;
+}
+
+async function verbindeStreifen(quelle, live){
+  if (STREIFEN.quelle !== quelle) Object.assign(STREIFEN, {quelle, eintraege: [], gesamt: 0, summe: null, offen: new Set(), amEnde: true, oben: 0});
+  // Scrollposition über das Neuzeichnen hinweg merken: wer hochgescrollt hat, wird nicht nach unten gerissen
+  $("zeilen").addEventListener("scroll", e => {
+    const b = e.target; STREIFEN.oben = b.scrollTop; STREIFEN.amEnde = b.scrollHeight - b.scrollTop - b.clientHeight < 40;
+  });
+  $("filter").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    STREIFEN.filter = b.dataset.f;
+    document.querySelectorAll("#filter button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    STREIFEN.amEnde = true; zeichneStreifen();
+  });
+  $("zeilen").addEventListener("click", e => {
+    const z = e.target.closest(".zeile.klickbar"); if (!z) return;
+    const i = +z.dataset.i; STREIFEN.offen.has(i) ? STREIFEN.offen.delete(i) : STREIFEN.offen.add(i);
+    zeichneStreifen();
+  });
+  $("streifen-live").innerHTML = live ? '<span class="live">live</span>' : "";
+  zeichneStreifen();
+  try {
+    const d = await api(`${quelle}?ab=${STREIFEN.gesamt}`);
+    if (STREIFEN.quelle !== quelle) return;
+    if (d.gesamt < STREIFEN.gesamt) { STREIFEN.eintraege = []; }
+    STREIFEN.eintraege.push(...d.eintraege);
+    STREIFEN.gesamt = d.gesamt; STREIFEN.summe = d.summe;
+    if ($("zeilen")) zeichneStreifen();
+  } catch (e) { if ($("zeilen")) $("zeilen").innerHTML = `<div class="leer-streifen">${esc(e.message)}</div>` }
+}
+
+function zeitText(s){ return s ? s.slice(11, 19) : "" }
+function sek(s){ return s == null ? "" : s < 60 ? `${s.toFixed(1)} s` : `${Math.floor(s / 60)} min ${Math.round(s % 60)} s` }
+function kurzTokens(n){ return n >= 1e6 ? `${(n / 1e6).toFixed(2).replace(".", ",")} Mio` : n >= 1e4 ? `${Math.round(n / 1e3)} Tsd` : zahl(n) }
+
+function zeileHtml(e, i){
+  const offen = STREIFEN.offen.has(i);
+  if (e.art === "antwort") {
+    return `<div class="zeile klickbar" data-i="${i}" title="Klicken für Details"><span class="zeit">${zeitText(e.zeit)}</span>
+      <span class="was">${esc(e.testfall_id)} ${esc(e.modell)}${e.wiederholung > 1 ? " #" + e.wiederholung : ""}</span>
+      <span class="erg">${esc(e.ergebnis)}</span><span class="rechts">${sek(e.dauer_s)}</span>
+      ${offen ? `<div class="detail">Antwort von ${esc(e.modell)} zu ${esc(e.testfall_id)}
+Ergebnis: ${esc(e.ergebnis)}
+Tokens: ${zahl(e.tokens_rein)} rein, ${zahl(e.tokens_raus)} raus
+Dauer: ${sek(e.dauer_s)}${e.versuche > 1 ? `, ${e.versuche} Versuche` : ""}
+Abbruchgrund: ${esc(e.abbruchgrund)}</div>` : ""}</div>`;
+  }
+  if (e.art === "urteil") {
+    const urteil = e.flag ? `<span class="flag">${e.fehlertypen.length ? esc(e.fehlertypen.join(", ")) : "Flag"}</span>` : '<span class="ok">ok</span>';
+    const kurz = {zahlen: "Zahlen", rechenweg: "Rechenweg", plausibilitaet: "Plausibilität"}[e.judge] || e.judge;
+    return `<div class="zeile klickbar" data-i="${i}" title="Klicken für Details"><span class="zeit">${zeitText(e.zeit)}</span>
+      <span class="was">${esc(e.testfall_id)} ${esc(kurz)}</span>
+      <span class="erg">${urteil}</span><span class="rechts">${sek(e.dauer_s)}</span>
+      ${offen ? `<div class="detail">${esc(JUDGES[e.judge] || e.judge)} (${esc(e.judge_modell)}) zur Antwort von ${esc(e.modell)} auf ${esc(e.testfall_id)}
+${e.judge_fehler ? "Kaputtes Urteil, zählt als Flag.\n" : ""}Befund: ${esc(e.befund)}
+Tokens: ${zahl(e.tokens_rein)} rein, ${zahl(e.tokens_raus)} raus
+Dauer: ${sek(e.dauer_s)}${e.versuche > 1 ? `, ${e.versuche} Versuche` : ""}</div>` : ""}</div>`;
+  }
+  return `<div class="zeile ${esc(e.art)}"><span class="zeit">${zeitText(e.zeit)}</span><span class="was">${esc((e.text || "").trim())}</span></div>`;
+}
+
+function zeichneStreifen(){
+  const box = $("zeilen"); if (!box) return;
+  const s = STREIFEN.summe;
+  $("summe").innerHTML = s ? `
+    <div><b>${zahl(s.anfragen)}</b><span>Anfragen</span></div>
+    <div><b style="color:${s.fehler ? "var(--rot)" : "inherit"}">${zahl(s.fehler)}</b><span>Fehler</span></div>
+    <div><b>${kurzTokens(s.tokens_rein + s.tokens_raus)}</b><span>Tokens</span></div>
+    <div><b>${s.anfragen ? sek(s.dauer_s / s.anfragen) : "–"}</b><span>pro Anfrage</span></div>` : "";
+  const f = STREIFEN.filter;
+  const liste = STREIFEN.eintraege.map((e, i) => [e, i]).filter(([e]) => f === "alle" || e.art === f);
+  box.innerHTML = liste.length ? liste.map(([e, i]) => zeileHtml(e, i)).join("")
+    : `<div class="leer-streifen">${STREIFEN.gesamt || STREIFEN.summe ? "Nichts für diesen Filter." : "Noch nichts passiert. Sobald der Lauf startet, erscheint hier jede Anfrage mit Modell, Dauer und Ergebnis."}</div>`;
+  box.scrollTop = STREIFEN.amEnde ? box.scrollHeight : STREIFEN.oben;
+}
+
+// ---------- Kalibrierung ----------
+function zeigeKalibrierung(){
+  const job = STATUS.job, laeuft = job && job.laeuft;
+  const kalJob = job && job.name.startsWith("kalibrierung:") ? job : null;
+  const noetig = [...new Set(Object.values(STATUS.config.judges).map(z => z.anbieter).filter(a => a !== "test"))];
+  const fehlend = noetig.filter(a => !STATUS.schluessel[a]);
+  const letzte = STATUS.kalibrierungen[0];
+  const offen = letzte && !letzte.ergebnis && !(kalJob && kalJob.laeuft) ? letzte : null;
+  const fortschritt = kalJob && kalJob.laeuft && kalJob.fortschritt.match(/^Judges: (\d+)\/(\d+)$/);
+
+  $("seite").innerHTML = `<div class="zwei"><section>
+    <div class="titel"><h1>Judge-Kalibrierung</h1></div>
+    <p>Finden die Judges Fehler, die wir absichtlich eingebaut haben? ${STATUS.kalibrierung_antworten} Antworten zu deinen Testfällen:
+    erfundene Zahlen, falsche Quellen, Rechenfehler und fehlende Pflicht-Infos, dazu fehlerfreie Antworten.
+    Ein Judge besteht, wenn er alle eingebauten Fehler seines Bereichs findet und keine fehlerfreie Antwort flaggt.</p>
+    <p class="leise">Es nutzt die Judges aus den Einstellungen: ${Object.entries(STATUS.config.judges).map(([j, z]) => `${JUDGES[j] || j} ${esc(z.anbieter)}:${esc(z.modell)}`).join(", ")}.</p>
+    ${fehlend.length ? `<div class="hinweis fehler">Es fehlen API-Schlüssel für ${fehlend.join(", ")}. <a href="#einstellungen">Eintragen</a>.</div>` : ""}
+    <div class="knoepfe">
+      <button class="knopf" id="kal-start" ${laeuft || fehlend.length ? "disabled" : ""}>${kalJob && kalJob.laeuft ? "Läuft …" : "Kalibrierung starten"}</button>
+      ${offen ? `<button class="knopf zweit" id="kal-weiter" ${laeuft || (fehlend.length && !offen.test) ? "disabled" : ""}>Abgebrochene fortsetzen</button>` : ""}
+      <button class="knopf zweit" id="kal-probe" ${laeuft ? "disabled" : ""}>Probe mit Testmodellen</button>
+    </div>
+    ${laeuft && !kalJob ? `<p class="leise">Gerade läuft ${esc(job.name)}. Es läuft immer nur eins gleichzeitig.</p>` : ""}
+    ${fortschritt ? `<div class="kette" style="grid-template-columns:1fr">${glied("Judge-Urteile", +fortschritt[1], +fortschritt[2])}</div>` : ""}
+    ${kalJob && kalJob.ergebnis === "unvollstaendig" ? `<div class="hinweis fehler">Nicht alle Judge-Anfragen haben geklappt. „Abgebrochene fortsetzen“ drücken.</div>` : ""}
+    ${kalJob && kalJob.ergebnis === "fehler" ? `<div class="hinweis fehler">Abgebrochen: ${esc(kalJob.log[kalJob.log.length - 1] || "")}</div>` : ""}
+    <div style="margin-top:1.25rem">${STATUS.kalibrierungen.filter(k => k.ergebnis).map(kalKarte).join("")}</div>
+    </section>
+    ${letzte ? streifenHtml() : ""}</div>`;
+
+  const los = async (inhalt, knopf) => {
+    knopf.disabled = true;
+    try { await api("api/kalibrierung", inhalt); await lade() }
+    catch (err) { alert(err.message); knopf.disabled = false }
+  };
+  $("kal-start").addEventListener("click", e => los({}, e.target));
+  $("kal-probe").addEventListener("click", e => los({test: true}, e.target));
+  if ($("kal-weiter")) $("kal-weiter").addEventListener("click", e => los({name: offen.name}, e.target));
+  if (letzte) verbindeStreifen(`api/kalibrierungen/${encodeURIComponent(letzte.name)}/protokoll`, kalJob && kalJob.laeuft);
+}
+
+function kalKarte(k){
+  const zeilen = Object.entries(k.ergebnis).map(([j, e]) => `<tr>
+      <td>${JUDGES[j] || esc(j)}<div class="leise">${esc(k.judges[j] || "")}</div></td>
+      <td>${e.treffer} von ${e.soll}</td>
+      <td>${e.fehlalarme} von ${e.sauber}</td>
+      <td>${e.kaputt}</td>
+      <td>${e.bestanden ? '<span class="etikett ok">bestanden</span>' : '<span class="etikett nein">nachschärfen</span>'}</td></tr>`).join("");
+  return `<div class="karte">
+    <h3 style="margin-top:0">${esc(k.name)} ${k.test ? '<span class="etikett test">Probe</span>' : ""}</h3>
+    <table class="tabelle"><tr><th>Judge</th><th>Fehler gefunden</th><th>Fehlalarme</th><th>Kaputte Urteile</th><th></th></tr>${zeilen}</table>
+    <div class="knoepfe"><a class="knopf zweit" href="kalibrierungen/${encodeURIComponent(k.name)}/kalibrierung.html" target="_blank">Details: was wurde übersehen?</a></div>
+  </div>`;
+}
+
+// ---------- Einstellungen ----------
+function modellzeile(z, entfernbar){
+  return `<div class="modellzeile">
+    <select aria-label="Anbieter">${ANBIETER.map(a => `<option ${a === z.anbieter ? "selected" : ""}>${a}</option>`).join("")}</select>
+    <input type="text" aria-label="Modellname" value="${esc(z.modell)}" placeholder="Modellname">
+    <input type="text" aria-label="Effort (optional)" value="${esc(z.effort || "")}" placeholder="effort">
+    ${entfernbar ? '<button type="button" class="weg" title="Entfernen" aria-label="Entfernen">×</button>' : "<span></span>"}</div>`;
+}
+const leseZeile = z => { const [a, m, e] = z.querySelectorAll("select,input"); return {anbieter: a.value, modell: m.value, effort: e.value.trim()} };
+
+function zeigeEinstellungen(){
+  const c = STATUS.config;
+  $("seite").innerHTML = `<div style="max-width:52rem">
+    <div class="titel"><h1>Einstellungen</h1></div>
+    <form class="karte" id="f-schluessel" style="margin-top:1rem">
+      <h2>API-Schlüssel</h2>
+      <p class="leise">Werden nur lokal in der Datei <code>.env</code> im Projektordner gespeichert und nie angezeigt. Leer lassen heißt: nicht ändern.</p>
+      <div class="raster">
+        ${[["anthropic", "Anthropic"], ["openai", "OpenAI"], ["google", "Google (Gemini)"]].map(([a, n]) => `
+          <label for="k-${a}">${n} <span class="status-schluessel ${STATUS.schluessel[a] ? "ja" : "nein"}">${STATUS.schluessel[a] ? "gesetzt" : "fehlt"}</span></label>
+          <input type="password" id="k-${a}" autocomplete="off" placeholder="${STATUS.schluessel[a] ? "•••••••• (gesetzt)" : "Schlüssel einfügen"}">`).join("")}
+      </div>
+      <div class="knoepfe"><button class="knopf">Schlüssel speichern</button><span class="meldung" id="m-schluessel" role="status"></span></div>
+    </form>
+
+    <form class="karte" id="f-config">
+      <h2>Modelle und Lauf</h2>
+      <p class="leise">Gilt für neue Läufe. Bestehende Läufe behalten ihre Einstellungen.</p>
+      <h3>Getestete Modelle</h3>
+      <div id="testobjekte">${c.testobjekte.map(z => modellzeile(z, true)).join("")}</div>
+      <button type="button" class="knopf zweit" id="plus">Modell hinzufügen</button>
+      <h3>Judges, am besten aus anderen Modellfamilien als das getestete Modell</h3>
+      ${Object.entries(JUDGES).map(([j, n]) => `<div class="leise">${n}</div><div data-judge="${j}">${modellzeile(c.judges[j] || {anbieter: "openai", modell: ""}, false)}</div>`).join("")}
+      <h3>Ablauf</h3>
+      <div class="raster">
+        <label for="wdh">Wiederholungen pro Frage</label><input type="number" id="wdh" min="1" max="10" value="${c.wiederholungen}">
+        <label for="anteil">Stichprobe in Prozent</label><input type="number" id="anteil" min="0" max="100" value="${Math.round(c.stichprobe.anteil * 100)}">
+        <label for="minimum">Stichprobe mindestens</label><input type="number" id="minimum" min="0" value="${c.stichprobe.minimum}">
+      </div>
+      <div class="knoepfe"><button class="knopf" id="config-speichern">Einstellungen speichern</button><span class="meldung" id="m-config" role="status"></span></div>
+    </form></div>`;
+
+  const melde = (id, text, ok) => { $(id).textContent = text; $(id).style.color = ok ? "var(--gruen)" : "var(--rot)" };
+  $("f-schluessel").addEventListener("submit", async e => {
+    e.preventDefault();
+    const eingabe = {anthropic: $("k-anthropic").value, openai: $("k-openai").value, google: $("k-google").value};
+    if (!Object.values(eingabe).some(v => v.trim())) return melde("m-schluessel", "Nichts eingegeben.", false);
+    try { await api("api/schluessel", eingabe); await lade(); melde("m-schluessel", "Gespeichert.", true) }
+    catch (err) { melde("m-schluessel", err.message, false) }
+  });
+  $("plus").addEventListener("click", () => $("testobjekte").insertAdjacentHTML("beforeend", modellzeile({anbieter: "openai", modell: ""}, true)));
+  $("testobjekte").addEventListener("click", e => { if (e.target.classList.contains("weg")) e.target.closest(".modellzeile").remove() });
+  $("f-config").addEventListener("submit", async e => {
+    e.preventDefault();
+    const judges = {};
+    document.querySelectorAll("[data-judge]").forEach(d => judges[d.dataset.judge] = leseZeile(d.querySelector(".modellzeile")));
+    try {
+      await api("api/config", {
+        testobjekte: [...$("testobjekte").querySelectorAll(".modellzeile")].map(leseZeile),
+        judges, wiederholungen: +$("wdh").value,
+        stichprobe: {anteil: +$("anteil").value / 100, minimum: +$("minimum").value}});
+      await lade(); melde("m-config", "Gespeichert.", true);
+    } catch (err) { melde("m-config", err.message, false) }
+  });
+}
+
+// ---------- Neuer Lauf (Leiste) ----------
+$("neu").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("neu-meldung").textContent = "";
+  try {
+    const d = await api("api/laeufe", {name: $("neu-name").value, test: $("neu-test").checked});
+    $("neu-name").value = ""; $("neu-test").checked = false;
+    location.hash = encodeURIComponent(d.name);
+    await lade();
+  } catch (err) { $("neu-meldung").textContent = err.message }
+});
+
+window.addEventListener("hashchange", () => STATUS && zeige());
+window.addEventListener("focus", () => { if (!(STATUS && STATUS.job && STATUS.job.laeuft) && location.hash !== "#einstellungen") lade() });
+lade();
+</script>
+</body>
+</html>

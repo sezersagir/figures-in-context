@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+# eigene Läufe und Kalibrierungen bleiben lokal, nur das Beispiel ist im Repo
+laeufe/*
+!laeufe/.gitkeep
+!laeufe/2026-10-18_beispiel/
+kalibrierungen/
+*.tmp

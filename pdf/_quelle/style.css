@@ -1,0 +1,8 @@
+body{font-family:'DejaVu Sans',Arial,sans-serif;font-size:10pt;color:#1a1a1a;line-height:1.45;max-width:none}
+h1{font-size:20pt;margin:0 0 4pt} h2{font-size:14pt;border-bottom:2px solid #1f4e79;padding-bottom:3pt;margin-top:18pt;color:#1f4e79}
+h3{font-size:12pt;color:#1f4e79;margin:0 0 6pt} h4{font-size:11pt;margin:12pt 0 4pt}
+table{border-collapse:collapse;width:100%;margin:4pt 0 8pt;font-size:9pt} th,td{border:1px solid #c8c8c8;padding:3pt 5pt;text-align:left;vertical-align:top} th{background:#eef3f8}
+blockquote{margin:4pt 0;padding:5pt 9pt;background:#f5f5f5;border-left:3px solid #1f4e79}
+.case{page-break-before:always;border:1px solid #d6dee6;border-radius:4px;padding:8pt 10pt;margin:10pt 0}
+.doc{page-break-before:always} hr{border:none;border-top:1px dashed #aaa}
+code{font-size:9pt}
